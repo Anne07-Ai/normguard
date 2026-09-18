@@ -77,6 +77,40 @@ class ProtectedNormaliserTests(unittest.TestCase):
         self.assertEqual(result.spans[0].rule_id, "long")
         self.assertEqual(result.output_text, "AX 20 shoe")
 
+    def test_explicit_p2_rule_uses_injected_morphology(self) -> None:
+        rules = [
+            PolicyRule(
+                "retail-p2",
+                PolicyClass.CONTEXT_NORMALISABLE,
+                "exact",
+                "shoes",
+            )
+        ]
+        result = ProtectedNormaliser(rules, self.lemma).normalise("shoes")
+        self.assertEqual(result.output_text, "shoe")
+        self.assertEqual(self.lemma.tokens, ["shoes"])
+        self.assertEqual(result.spans[0].candidate_lemma, "shoe")
+
+    def test_p0_outranks_overlapping_lower_safety_rule(self) -> None:
+        rules = [
+            PolicyRule(
+                "broad-p2",
+                PolicyClass.CONTEXT_NORMALISABLE,
+                "regex",
+                r"SKU-[A-Z]{2}\d{4}",
+            ),
+            PolicyRule(
+                "exact-p0",
+                PolicyClass.EXACT_PRESERVE,
+                "exact",
+                "SKU-AX2048",
+            ),
+        ]
+        result = ProtectedNormaliser(rules, self.lemma).normalise("SKU-AX2048")
+        self.assertEqual(result.output_text, "SKU-AX2048")
+        self.assertEqual(result.spans[0].rule_id, "exact-p0")
+        self.assertEqual(self.lemma.tokens, [])
+
     def test_whitespace_and_case_are_stable(self) -> None:
         first = self.normaliser.normalise("  WOMEN\t shoes  ")
         second = self.normaliser.normalise("  WOMEN\t shoes  ")
