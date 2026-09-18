@@ -69,7 +69,9 @@ class ProtectedNormaliser:
             traces.extend(gap_traces)
 
             source = text[match.start : match.end]
-            emitted, action = self._apply_policy(source, match.rule)
+            emitted, action, normalised_surface, candidate_lemma = self._apply_policy(
+                source, match.rule
+            )
             chunks.append(emitted)
             traces.append(
                 SpanTrace(
@@ -80,6 +82,8 @@ class ProtectedNormaliser:
                     action=action,
                     emitted_text=emitted,
                     rule_id=match.rule.rule_id,
+                    normalised_surface=normalised_surface,
+                    candidate_lemma=candidate_lemma,
                 )
             )
             review_required |= match.rule.policy_class is PolicyClass.REVIEW_OR_ABSTAIN
@@ -98,21 +102,29 @@ class ProtectedNormaliser:
             for match in pattern.finditer(text)
             if match.end() > match.start()
         ]
+        safety_priority = {
+            PolicyClass.EXACT_PRESERVE: 0,
+            PolicyClass.APPROVED_ALIAS: 1,
+            PolicyClass.REVIEW_OR_ABSTAIN: 2,
+            PolicyClass.CONTEXT_NORMALISABLE: 3,
+        }
         candidates.sort(
             key=lambda item: (
-                item.start,
+                safety_priority[item.rule.policy_class],
                 -(item.end - item.start),
+                item.start,
                 item.rule.rule_id,
             )
         )
 
         selected: list[_Match] = []
-        occupied_until = -1
         for candidate in candidates:
-            if candidate.start >= occupied_until:
+            if not any(
+                candidate.start < existing.end and existing.start < candidate.end
+                for existing in selected
+            ):
                 selected.append(candidate)
-                occupied_until = candidate.end
-        return tuple(selected)
+        return tuple(sorted(selected, key=lambda item: item.start))
 
     def _normalise_unprotected(
         self,
@@ -154,16 +166,21 @@ class ProtectedNormaliser:
         chunks.append(unicodedata.normalize("NFC", segment[cursor:]))
         return "".join(chunks), traces
 
-    @staticmethod
-    def _apply_policy(source: str, rule: PolicyRule) -> tuple[str, SpanAction]:
+    def _apply_policy(
+        self,
+        source: str,
+        rule: PolicyRule,
+    ) -> tuple[str, SpanAction, str | None, str | None]:
         if rule.policy_class is PolicyClass.EXACT_PRESERVE:
-            return source, SpanAction.PRESERVED
+            return source, SpanAction.PRESERVED, None, None
         if rule.policy_class is PolicyClass.APPROVED_ALIAS:
             assert rule.approved_output is not None
-            return rule.approved_output, SpanAction.TRANSFORMED
+            return rule.approved_output, SpanAction.TRANSFORMED, None, None
         if rule.policy_class is PolicyClass.REVIEW_OR_ABSTAIN:
-            return source, SpanAction.REVIEW
-        candidate = source.casefold()
-        return candidate, (
-            SpanAction.PRESERVED if candidate == source else SpanAction.TRANSFORMED
-        )
+            return source, SpanAction.REVIEW, None, None
+
+        normalised_surface = unicodedata.normalize("NFC", source).casefold()
+        candidate = self._lemmatise(normalised_surface)
+        emitted = unicodedata.normalize("NFC", candidate).casefold()
+        action = SpanAction.PRESERVED if emitted == source else SpanAction.TRANSFORMED
+        return emitted, action, normalised_surface, candidate
