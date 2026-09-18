@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="420" viewBox="0 0 1440 420" role="img" aria-labelledby="title desc">
+  <title id="title">NormGuard</title>
+  <desc id="desc">Domain-aware text normalisation quality engineering for search and retrieval systems.</desc>
+  <rect width="1440" height="420" fill="#0b1220"/>
+  <path d="M0 330 C240 260 410 390 680 305 S1110 225 1440 300 V420 H0Z" fill="#102235"/>
+  <g opacity=".34" stroke="#274158" stroke-width="1">
+    <path d="M80 70H1360M80 120H1360M80 170H1360M80 220H1360M80 270H1360M80 320H1360"/>
+    <path d="M160 45V350M320 45V350M480 45V350M640 45V350M800 45V350M960 45V350M1120 45V350M1280 45V350"/>
+  </g>
+  <g transform="translate(104 112)">
+    <rect width="72" height="38" rx="8" fill="#14293c" stroke="#2dd4bf"/>
+    <text x="36" y="25" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="14" fill="#ccfbf1">INPUT</text>
+    <path d="M82 19H132" stroke="#64748b" stroke-width="2"/>
+    <circle cx="146" cy="19" r="14" fill="#112b2c" stroke="#2dd4bf"/>
+    <path d="m140 19 4 4 8-10" fill="none" stroke="#5eead4" stroke-width="2.5"/>
+  </g>
+  <g transform="translate(1030 104)" font-family="ui-monospace, SFMono-Regular, monospace" font-size="15">
+    <rect width="286" height="122" rx="12" fill="#0f1c2b" stroke="#334155"/>
+    <circle cx="24" cy="27" r="5" fill="#2dd4bf"/><text x="40" y="32" fill="#cbd5e1">meaning preserved</text>
+    <circle cx="24" cy="61" r="5" fill="#f59e0b"/><text x="40" y="66" fill="#cbd5e1">review required</text>
+    <circle cx="24" cy="95" r="5" fill="#ef4444"/><text x="40" y="100" fill="#cbd5e1">regression blocked</text>
+  </g>
+  <text x="720" y="148" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui" font-size="66" font-weight="700" fill="#f8fafc" letter-spacing="-2">NormGuard</text>
+  <text x="720" y="194" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui" font-size="20" fill="#94a3b8">Text normalisation, measured before it ships.</text>
+  <g transform="translate(458 246)" font-family="ui-monospace, SFMono-Regular, monospace" font-size="15">
+    <rect width="524" height="50" rx="10" fill="#101e2d" stroke="#334155"/>
+    <text x="24" y="31" fill="#94a3b8">vulnerabilities</text>
+    <path d="M178 25H224" stroke="#64748b" stroke-width="2"/>
+    <text x="246" y="31" fill="#5eead4">vulnerability</text>
+    <text x="430" y="31" fill="#fbbf24">SAFE</text>
+  </g>
+</svg>
