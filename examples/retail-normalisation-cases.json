@@ -1,0 +1,28 @@
+{
+  "fixture_version": "0.1.0",
+  "domain": "retail",
+  "locale": "en-GB",
+  "cases": [
+    {
+      "case_id": "retail-p0-001",
+      "input": "Running shoes SKU-AX2048",
+      "expected_output": "run shoe SKU-AX2048",
+      "expected_review": false,
+      "purpose": "P0 identifier preservation before morphology"
+    },
+    {
+      "case_id": "retail-p1-001",
+      "input": "blue trainers",
+      "expected_output": "blue sneakers",
+      "expected_review": false,
+      "purpose": "approved alias only"
+    },
+    {
+      "case_id": "retail-p3-001",
+      "input": "limited-edition shoes",
+      "expected_output": "limited-edition shoe",
+      "expected_review": true,
+      "purpose": "ambiguous term preservation with visible review"
+    }
+  ]
+}
