@@ -71,8 +71,107 @@ The combination still requiring validation is:
 ## Remaining Phase 1 landscape work
 
 - Expand the map to at least 15 credible tools, products or papers.
-- Review search relevance testing products and commercial platforms.
 - Search GitHub and package registries for close open-source implementations.
 - Record licences, maintenance signals, language coverage and integration cost.
 - Verify whether current RAG evaluation frameworks can express the proposed normalisation comparison.
 - Produce a dated novelty assessment without claiming exhaustive patent clearance.
+
+---
+
+## Search platforms and relevance tooling — verified review
+
+> Review date: 18 September 2026. This pass uses first-party product documentation and distinguishes built-in capability from workflows that require external composition.
+
+### Capability comparison
+
+| Capability | Elasticsearch | OpenSearch | Apache Solr | NormGuard candidate role |
+|---|---|---|---|---|
+| Configurable stemming/analyzers | Built in | Built in | Built in | Adapter, not replacement |
+| Protected terms | Keyword markers, exclusions, overrides and conditional filters | Analyzer/filter configuration; protection can be composed | Protected Term Filter wraps filters and skips declared terms | Cross-engine policy plus verification |
+| Inspect analysed tokens | Analyze API | Analyze API | Analysis tooling/API | Normalised trace format across engines |
+| Judged offline ranking evaluation | Rank Evaluation API | Rank Evaluation API and Search Relevance Workbench | Requires a composed/external harness in the reviewed guide | One protocol across engines |
+| Query-set experiments | API payload/workflow | Query sets, configurations, judgments and experiments | Requires composition in reviewed material | Versioned experiment manifest |
+| Scheduled/continuous experiments | External automation around API | Experiments can be scheduled | External automation | CI-native gate and evidence bundle |
+| Automatic optimisation/recommendation | Not a normalisation-specific recommendation system | Hybrid optimiser and relevance agent exist | Not documented in reviewed guide | Constrained normalisation recommendation only |
+| Terminology damage taxonomy | Not documented | Not documented | Not documented | P0–P3, F01–F10 and severity evidence |
+| Cross-engine comparison | Not built in | Not built in | Not built in | Core requirement |
+
+### Elasticsearch
+
+Elasticsearch already supplies two major parts of the proposed workflow:
+
+- its [stemming guidance](https://www.elastic.co/docs/manage-data/data-store/text-analysis/stemming) describes algorithmic and dictionary stemmers, recommends consistent index/search analysis, and documents controls including stemmer overrides and token exclusion;
+- its [Rank Evaluation API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-rank-eval) evaluates ranked results against rated documents and exposes programmatic relevance evaluation.
+
+Therefore, NormGuard must not claim that protected stemming, analyzer inspection, relevance metrics, or relevance regression testing are new. A developer can already compose those capabilities inside the Elastic ecosystem.
+
+Observed boundary: the reviewed documentation does not define a normalisation-specific safety taxonomy, inspect protected spans across multiple engines, or produce a cross-engine PASS/REVIEW/FAIL/INCONCLUSIVE decision.
+
+### OpenSearch
+
+OpenSearch overlaps most strongly with the original broad concept. Its current [Search Relevance Workbench](https://docs.opensearch.org/latest/search-plugins/search-relevance/index/) is described as a suite for query comparison, result evaluation, and A/B testing.
+
+Verified components include:
+
+- [query sets](https://docs.opensearch.org/latest/search-plugins/search-relevance/query-sets/) that can be imported or sampled from user behaviour;
+- versioned [search configurations](https://docs.opensearch.org/latest/search-plugins/search-relevance/search-configurations/);
+- judgment lists, including [AI-assisted judgments](https://docs.opensearch.org/latest/search-plugins/search-relevance/judgments/);
+- pointwise, pairwise and hybrid-optimisation [experiments](https://docs.opensearch.org/latest/search-plugins/search-relevance/experiments/), including scheduled execution;
+- single-query and query-set [result comparison](https://docs.opensearch.org/latest/search-plugins/search-relevance/comparing-search-results/);
+- experiment dashboards for [exploring evaluation results](https://docs.opensearch.org/latest/search-plugins/search-relevance/explore-experiment-results/);
+- an [evaluation agent](https://docs.opensearch.org/latest/search-plugins/search-relevance/relevance-agent/) that can generate judgments and compare configurations using NDCG, MAP and Precision@K.
+
+This invalidates any NormGuard claim to novelty based only on query-set experiments, dashboards, scheduled evaluation, LLM-generated judgments, or automatic search-configuration assistance.
+
+Observed boundary: OpenSearch is engine-native and broader than normalisation. The reviewed pages do not describe the P0–P3 protected-term contract, F01–F10 damage labels, exact identifier-retention gates, or matched comparisons across Elasticsearch, Solr, standalone NLP libraries, and OpenSearch.
+
+### Apache Solr
+
+Solr provides mature analysis-chain building blocks. The official [filter reference](https://solr.apache.org/guide/solr/latest/indexing-guide/filters.html) documents Porter and Snowball stemming and a **Protected Term Filter** that applies wrapped filters only to terms outside a declared protected set.
+
+Consequently, protected-word files and conditional analysis are established Solr capabilities, not NormGuard inventions.
+
+In the first-party Solr material reviewed in this pass, no integrated counterpart to OpenSearch Search Relevance Workbench was identified. That is a bounded documentation finding, not proof that the Solr ecosystem lacks external relevance tools.
+
+### Where capability already exists
+
+```mermaid
+flowchart TD
+    A["Search engine"] --> B["Configure analyzer"]
+    B --> C["Protect selected terms"]
+    C --> D["Run judged relevance evaluation"]
+    D --> E["Automate with engine-specific tooling"]
+```
+
+Most of this path is already possible, and OpenSearch packages much of it directly. NormGuard should integrate these systems rather than reproduce their analyzers or generic relevance dashboards.
+
+### Narrowed unsupported combination
+
+The remaining product hypothesis is:
+
+> An engine-neutral normalisation assurance layer that translates candidate analyzer/NLP configurations into one reproducible protocol, detects domain-term and identifier damage, compares retrieval utility and operational cost, and emits an auditable CI decision without forcing a winner.
+
+The individual ingredients are not novel. The combination remains worth testing only if developer interviews confirm that teams struggle to compose and maintain it.
+
+### Build / do-not-build boundary
+
+| Build in NormGuard | Reuse through adapters | Do not claim |
+|---|---|---|
+| Common run manifest and result schema | Elasticsearch/OpenSearch rank evaluation | invention of stemming or lemmatisation |
+| Protected-span fixtures and terminology policy | Engine analyzers and token filters | invention of protected terms |
+| Cross-engine transformation traces | OpenSearch query sets/experiments where applicable | first relevance-testing dashboard |
+| F01–F10 diagnosis and severity gates | Solr Protected Term Filter | first offline relevance metric runner |
+| Safety–utility–latency decision logic | Existing metrics and statistical libraries | universal automatic “best analyzer” |
+| CI evidence bundle and drift comparison | Engine deployment and indexing | safety certification |
+
+### Product decision
+
+**Proceed, but only with the narrowed scope.** A generic analyzer builder or relevance workbench would duplicate strong existing products. Phase 2 should test a thin, local-first assurance layer with one OpenSearch/Elasticsearch-style adapter and one standalone Python adapter. If developers do not value cross-engine evidence and terminology-specific gates, NormGuard should stop or become a small testing library rather than a platform.
+
+### Remaining validation
+
+- Verify close open-source relevance-testing projects and their maintenance/licences.
+- Complete the academic novelty review and RAG-evaluation comparison.
+- Test whether engine-specific result formats can map cleanly to one evidence schema.
+- Ask developers whether terminology failures currently escape generic relevance metrics.
+- Avoid exhaustive novelty or patent claims; this is a dated product-landscape review.
