@@ -23,10 +23,10 @@ A transformation may improve lexical matching, do nothing for dense retrieval, o
 
 | Input | Candidate output | Diagnostic |
 |---|---|---|
-| `vulnerabilities` | `vulnerability` | plausible lemma |
-| `running` | `run` | plausible contextual lemma |
-| `CVE-2026-1234` | unchanged | protected identifier |
-| `authorization` | `author` | possible harmful over-stemming |
+| `studies` | `study` | plausible lemma |
+| `went` | `go` | context-aware lemma |
+| `REF-2048` | unchanged | protected reference |
+| `university` | `univers` | aggressive stem requiring review |
 
 ## Proposed quality loop
 
