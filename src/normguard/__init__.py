@@ -12,14 +12,17 @@ from .contracts import (
     SpanAction,
     SpanTrace,
 )
+from .normalisation import NormalisationResult, ProtectedNormaliser
 
 __all__ = [
     "Decision",
     "EvidenceBundle",
     "Failure",
     "FailureCode",
+    "NormalisationResult",
     "PolicyClass",
     "PolicyRule",
+    "ProtectedNormaliser",
     "RunManifest",
     "Severity",
     "SpanAction",
