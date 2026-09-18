@@ -21,12 +21,12 @@ Stemming and lemmatisation are easy to enable. Their downstream consequences are
 
 A transformation may improve lexical matching, do nothing for dense retrieval, or corrupt a term whose exact form matters. NormGuard investigates whether developers can evaluate those trade-offs before a pipeline reaches production.
 
-| Input | Candidate output | Diagnostic |
-|---|---|---|
-| `vulnerabilities` | `vulnerability` | plausible lemma |
-| `running` | `run` | plausible contextual lemma |
-| `CVE-2026-1234` | unchanged | protected identifier |
-| `authorization` | `author` | possible harmful over-stemming |
+| Domain | Input | Candidate output | Diagnostic |
+|---|---|---|---|
+| Cybersecurity | `vulnerabilities` | `vulnerability` | plausible domain lemma |
+| Medical | `diagnoses` | `diagnosis` | plausible medical lemma |
+| Retail | `SKU-AX2048` | unchanged | protected product identifier |
+| Cross-domain risk | `organization` | `organ` | harmful over-stemming to reject |
 
 ## Proposed quality loop
 
