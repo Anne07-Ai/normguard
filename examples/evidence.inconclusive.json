@@ -1,0 +1,28 @@
+{
+  "contract_version": "0.1.0",
+  "run": {
+    "protocol_id": "NG-POC-001",
+    "protocol_version": "0.1.0",
+    "dataset_name": "synthetic-fixture",
+    "dataset_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "split_manifest_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "configuration_id": "C0",
+    "configuration_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "seed": 20260918,
+    "final_test": false,
+    "environment": {
+      "purpose": "contract-example-only"
+    },
+    "dependency_versions": {}
+  },
+  "decision": "INCONCLUSIVE",
+  "metrics": {
+    "ndcg_at_10": null,
+    "protected_term_violation_rate": null
+  },
+  "spans": [],
+  "failures": [],
+  "decision_reasons": [
+    "Synthetic fixture contains no relevance labels."
+  ]
+}
