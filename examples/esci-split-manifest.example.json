@@ -1,0 +1,36 @@
+{
+  "counts": {
+    "by_split": {
+      "calibration": 3329,
+      "development": 3356,
+      "train": 27119
+    },
+    "queries": 33804
+  },
+  "dataset": "Amazon Shopping Queries Dataset (ESCI), reduced ranking version",
+  "official_test_status": "sealed-not-read-or-transformed",
+  "outputs": {
+    "query-splits.csv": {
+      "sha256": "e815684de37a398dde2bafa6f4018fc7fdfb6e87a710965151b454f2efc2f276"
+    }
+  },
+  "schema_version": 1,
+  "source_partition": "train",
+  "split": {
+    "algorithm": "sha256-v1",
+    "seed": "normguard-esci-v1",
+    "thresholds": {
+      "calibration": 0.1,
+      "development": 0.1,
+      "train": 0.8
+    },
+    "unit": [
+      "product_locale",
+      "query_id"
+    ]
+  },
+  "upstream": {
+    "commit": "7916cdf6ab75a462e77f20ab40428a10923998d5",
+    "repository": "https://github.com/amazon-science/esci-data"
+  }
+}
