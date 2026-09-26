@@ -10,6 +10,8 @@
 
 [Research charter](research/charter.md) · [Landscape](research/landscape.md) · [Evaluation plan](research/evaluation-plan.md) · [Architecture](docs/architecture.md) · [Contributing](CONTRIBUTING.md)
 
+[Pinned ESCI dataset protocol](docs/esci-dataset.md)
+
 </div>
 
 > [!IMPORTANT]

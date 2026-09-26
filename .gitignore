@@ -209,6 +209,13 @@ tempCodeRunnerFile.py
 # PyPI configuration file
 .pypirc
 
+# Third-party datasets and generated local manifests
+# Keep corpus data out of Git; only reviewed provenance specifications and
+# example manifests belong in this repository.
+data/
+*.parquet
+artifacts/esci/
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
