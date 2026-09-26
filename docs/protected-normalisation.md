@@ -28,7 +28,17 @@ rule from taking precedence over an exact-preservation rule.
 
 ## Current boundary
 
-This unit proves policy ordering, transformation traces and safe engine injection
-using synthetic retail examples in
-`examples/retail-normalisation-cases.json`. It does not claim retrieval improvement
-and does not read ESCI or the sealed final-test split.
+`C0Adapter` implements the NFC, whitespace and Unicode-casefold baseline without
+lemmatisation. `C4SpacyAdapter` applies the same character policy and uses the pinned
+spaCy English model for contextual POS-aware lemmatisation. The C4 adapter loads only
+the components needed for tagging and lemmatisation; parser and NER are disabled.
+
+Before C4 invokes spaCy, P0, P1 and P3 spans are replaced in an equal-length masked
+view. spaCy therefore receives sentence context and stable character offsets without
+receiving the protected source text as a morphology candidate. P2 and unprotected
+tokens retain tokenizer offsets, POS, candidate lemmas and engine versions in their
+traces. Protected spans are emitted only according to their policy rule.
+
+These units prove policy ordering, transformation traces and safe engine boundaries
+using synthetic retail examples in `examples/retail-normalisation-cases.json`. They do
+not claim retrieval improvement and do not read ESCI or the sealed final-test split.
