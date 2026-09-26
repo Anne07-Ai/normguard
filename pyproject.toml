@@ -12,13 +12,28 @@ license = { text = "Apache-2.0" }
 authors = [
   { name = "NormGuard contributors" }
 ]
-dependencies = []
+dependencies = [
+  "bm25s==0.3.11",
+  "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl#sha256=1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85",
+  "ir-measures==0.4.3",
+  "numpy>=2.0,<3",
+  "spacy==3.8.16",
+]
 
 [project.optional-dependencies]
 esci = ["pyarrow>=18,<22"]
 
+[dependency-groups]
+dev = [
+  "pytest>=8,<10",
+  "ruff>=0.11,<1",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/normguard"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.ruff]
 target-version = "py312"

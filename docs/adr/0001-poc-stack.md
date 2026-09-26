@@ -1,6 +1,6 @@
 # ADR 0001: Proof-of-concept Python and evaluation stack
 
-- **Status:** Proposed for team approval
+- **Status:** Proposed; implementation verification in progress
 - **Date:** 18 September 2026
 - **Protocol:** NG-POC-001 v0.1.0
 - **Decision owners:** NormGuard maintainers
@@ -19,7 +19,7 @@ The stack must run on CPU, expose transformation traces, preserve reproducibilit
 | Project/lock manager | uv | commit generated `uv.lock`; CI uses `uv run --locked` |
 | C0 baseline | Python standard library | `unicodedata.normalize("NFC", text)`, explicit whitespace policy, `casefold()` |
 | C4 POS/lemma engine | spaCy | `spacy==3.8.16` |
-| English model | spaCy `en_core_web_sm` | 3.8-series wheel; exact URL and SHA-256 pinned in lock/bootstrap before code merge |
+| English model | spaCy `en_core_web_sm` | `3.8.0`; wheel URL and SHA-256 pinned in `pyproject.toml` and `uv.lock` |
 | BM25 | BM25S | `bm25s==0.3.11` |
 | IR metrics | ir-measures | `ir-measures==0.4.3` |
 | Numeric/bootstrap work | NumPy | exact version resolved and committed in `uv.lock` |
@@ -179,13 +179,14 @@ If offsets cannot be mapped deterministically after a transformation, the case i
 
 ## Validation required before implementation approval
 
-- [ ] Confirm the exact `en_core_web_sm` 3.8-series wheel URL and SHA-256.
-- [ ] Generate and commit `uv.lock` on the selected Python range.
-- [ ] Verify clean installs on Linux and macOS.
-- [ ] Add one BM25 hand-check fixture.
-- [ ] Add one offset-preservation fixture.
-- [ ] Record dependency licences.
-- [ ] Obtain a second maintainer review.
+- [x] Confirm the exact `en_core_web_sm` 3.8-series wheel URL and SHA-256.
+- [x] Generate and commit `uv.lock` on the selected Python range.
+- [x] Verify a clean Linux install; Linux is enforced by GitHub Actions.
+- [ ] Verify a clean macOS arm64 install before acceptance.
+- [x] Add one BM25 hand-check fixture.
+- [x] Add one offset-preservation fixture.
+- [x] Record direct dependency licences and transitive review requirement.
+- [ ] Obtain a second maintainer review before using final-test outcomes.
 
 ## Sources checked
 
