@@ -66,27 +66,21 @@ buckets:
 seed, source partition, query counts by split, and SHA-256 of the CSV. No generation timestamp is
 included, so identical inputs produce byte-identical outputs.
 
-## Example manifest shape
+## Verified manifest evidence
 
-```json
-{
-  "counts": {
-    "by_split": {
-      "calibration": 1,
-      "development": 1,
-      "train": 8
-    },
-    "queries": 10
-  },
-  "official_test_status": "sealed-not-read-or-transformed",
-  "outputs": {
-    "query-splits.csv": {
-      "sha256": "<generated SHA-256>"
-    }
-  },
-  "source_partition": "train"
-}
-```
+The pinned dataset produced 33,804 unique training queries:
 
-The example illustrates the contract rather than claiming the final real-data split counts. The
-locally generated manifest is the evidence record for the pinned corpus.
+| NormGuard split | Query count |
+|---|---:|
+| Train | 27,119 |
+| Calibration | 3,329 |
+| Development | 3,356 |
+| **Total** | **33,804** |
+
+The generated `query-splits.csv` SHA-256 is
+`e815684de37a398dde2bafa6f4018fc7fdfb6e87a710965151b454f2efc2f276`.
+
+See the versioned
+[example manifest](../examples/esci-split-manifest.example.json) for the complete evidence shape.
+The manifest contains metadata and checksums only; neither the corpus nor query assignments are
+committed.
