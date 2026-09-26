@@ -1,0 +1,10 @@
+{
+  "source": "Running shoes SKU-AX2048",
+  "expected_output": "running shoes SKU-AX2048",
+  "protected_span": {
+    "text": "SKU-AX2048",
+    "start": 14,
+    "end": 24,
+    "rule_id": "retail-sku"
+  }
+}

@@ -14,7 +14,6 @@ from normguard.contracts import (
     SpanTrace,
 )
 
-
 DIGEST = "a" * 64
 
 

@@ -24,10 +24,20 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Compile package
-        run: python -m compileall -q src tests
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.18"
+          enable-cache: true
 
-      - name: Run dependency-free contract tests
-        env:
-          PYTHONPATH: src
-        run: python -m unittest discover -s tests -v
+      - name: Install locked environment
+        run: uv sync --locked --all-extras --dev
+
+      - name: Compile package
+        run: uv run --locked python -m compileall -q src tests
+
+      - name: Lint
+        run: uv run --locked ruff check src tests
+
+      - name: Run contract tests
+        run: uv run --locked python -m unittest discover -s tests -v

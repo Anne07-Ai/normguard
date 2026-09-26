@@ -11,9 +11,9 @@ import csv
 import hashlib
 import json
 from collections import Counter
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Mapping, Sequence
 
 UPSTREAM_REPOSITORY = "https://github.com/amazon-science/esci-data"
 UPSTREAM_COMMIT = "7916cdf6ab75a462e77f20ab40428a10923998d5"

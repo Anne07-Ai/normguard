@@ -6,10 +6,10 @@ adapters may depend on third-party packages, but evidence remains portable.
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
-from typing import Any, Mapping, Sequence
-
+from typing import Any
 
 CONTRACT_VERSION = "0.1.0"
 
@@ -104,16 +104,20 @@ class SpanTrace:
             raise ValueError("span offsets must satisfy 0 <= start < end")
         if len(self.text) != self.end - self.start:
             raise ValueError("span length must match end - start")
-        if self.policy_class is PolicyClass.EXACT_PRESERVE:
-            if self.action is not SpanAction.PRESERVED or self.emitted_text != self.text:
-                raise ValueError("P0 spans must be preserved exactly")
-        if self.policy_class is PolicyClass.REVIEW_OR_ABSTAIN:
-            if self.action not in {
+        if self.policy_class is PolicyClass.EXACT_PRESERVE and (
+            self.action is not SpanAction.PRESERVED or self.emitted_text != self.text
+        ):
+            raise ValueError("P0 spans must be preserved exactly")
+        if (
+            self.policy_class is PolicyClass.REVIEW_OR_ABSTAIN
+            and self.action
+            not in {
                 SpanAction.PRESERVED,
                 SpanAction.REVIEW,
                 SpanAction.ABSTAINED,
-            }:
-                raise ValueError("P3 spans cannot be transformed directly")
+            }
+        ):
+            raise ValueError("P3 spans cannot be transformed directly")
 
 
 @dataclass(frozen=True, slots=True)

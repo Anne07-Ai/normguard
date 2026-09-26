@@ -10,11 +10,11 @@ import re
 import unicodedata
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import Pattern
+from re import Pattern
 
 from .contracts import PolicyClass, PolicyRule, SpanAction, SpanTrace
 
-_TOKEN = re.compile(r"\w+(?:['’-]\w+)*", re.UNICODE)
+_TOKEN = re.compile(r"\w+(?:['\u2019-]\w+)*", re.UNICODE)
 _WHITESPACE = re.compile(r"\s+")
 
 
