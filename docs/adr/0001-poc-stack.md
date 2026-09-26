@@ -1,6 +1,6 @@
 # ADR 0001: Proof-of-concept Python and evaluation stack
 
-- **Status:** Proposed; implementation verification in progress
+- **Status:** Accepted
 - **Date:** 18 September 2026
 - **Protocol:** NG-POC-001 v0.1.0
 - **Decision owners:** NormGuard maintainers
@@ -182,7 +182,7 @@ If offsets cannot be mapped deterministically after a transformation, the case i
 - [x] Confirm the exact `en_core_web_sm` 3.8-series wheel URL and SHA-256.
 - [x] Generate and commit `uv.lock` on the selected Python range.
 - [x] Verify a clean Linux install; Linux is enforced by GitHub Actions.
-- [ ] Verify a clean macOS arm64 install before acceptance.
+- [x] Verify a clean macOS arm64 install (`uv sync --locked`; 22 tests passed).
 - [x] Add one BM25 hand-check fixture.
 - [x] Add one offset-preservation fixture.
 - [x] Record direct dependency licences and transitive review requirement.
