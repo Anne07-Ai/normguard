@@ -25,9 +25,17 @@ from .retrieval import (
     RetrievalQuery,
     compare_paired,
 )
+from .safety import (
+    AuditFinding,
+    ObservedSpan,
+    SafetyAuditResult,
+    SafetyCase,
+    TerminologySafetyAuditor,
+)
 
 __all__ = [
     "AdapterMetadata",
+    "AuditFinding",
     "BM25EvaluationHarness",
     "C0Adapter",
     "C4SpacyAdapter",
@@ -37,6 +45,7 @@ __all__ = [
     "FailureCode",
     "NormalisationAdapter",
     "NormalisationResult",
+    "ObservedSpan",
     "PairedComparison",
     "PolicyClass",
     "PolicyRule",
@@ -48,9 +57,12 @@ __all__ = [
     "RetrievalEvaluation",
     "RetrievalQuery",
     "RunManifest",
+    "SafetyAuditResult",
+    "SafetyCase",
     "Severity",
     "SpanAction",
     "SpanTrace",
+    "TerminologySafetyAuditor",
     "compare_paired",
 ]
 
