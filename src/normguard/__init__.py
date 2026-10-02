@@ -14,6 +14,7 @@ from .contracts import (
     SpanTrace,
 )
 from .normalisation import NormalisationResult, ProtectedNormaliser
+from .reporting import DecisionEvidence, EvidenceReporter, ExperimentReport
 from .retrieval import (
     BM25EvaluationHarness,
     PairedComparison,
@@ -40,7 +41,10 @@ __all__ = [
     "C0Adapter",
     "C4SpacyAdapter",
     "Decision",
+    "DecisionEvidence",
     "EvidenceBundle",
+    "EvidenceReporter",
+    "ExperimentReport",
     "Failure",
     "FailureCode",
     "NormalisationAdapter",
