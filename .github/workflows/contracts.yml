@@ -34,10 +34,20 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Compile package
-        run: uv run --locked python -m compileall -q src tests
+        run: uv run --locked python -m compileall -q src tests scripts
 
       - name: Lint
-        run: uv run --locked ruff check src tests
+        run: uv run --locked ruff check src tests scripts
 
       - name: Run contract tests
         run: uv run --locked python -m unittest discover -s tests -v
+
+      - name: Generate synthetic evidence
+        run: uv run --locked python scripts/generate_synthetic_evidence.py
+
+      - name: Upload synthetic evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: normguard-synthetic-evidence
+          path: artifacts/ci-evidence
+          if-no-files-found: error
