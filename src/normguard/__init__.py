@@ -13,6 +13,7 @@ from .contracts import (
     SpanAction,
     SpanTrace,
 )
+from .experiment import PairedStatistics, paired_statistics, select_bm25_parameters
 from .normalisation import NormalisationResult, ProtectedNormaliser
 from .reporting import DecisionEvidence, EvidenceReporter, ExperimentReport
 from .retrieval import (
@@ -51,6 +52,7 @@ __all__ = [
     "NormalisationResult",
     "ObservedSpan",
     "PairedComparison",
+    "PairedStatistics",
     "PolicyClass",
     "PolicyRule",
     "ProtectedNormaliser",
@@ -68,6 +70,8 @@ __all__ = [
     "SpanTrace",
     "TerminologySafetyAuditor",
     "compare_paired",
+    "paired_statistics",
+    "select_bm25_parameters",
 ]
 
 __version__ = "0.1.0"

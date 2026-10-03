@@ -27,6 +27,7 @@ class RetrievalQuery:
     query_id: str
     text: str
     partition: str
+    candidate_document_ids: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -112,23 +113,27 @@ class BM25EvaluationHarness:
         query_tokens = bm25s.tokenize(
             normalised_queries, stopwords=[], stemmer=None, show_progress=False
         )
-        result_ids, scores = retriever.retrieve(
-            query_tokens,
-            k=min(self.top_k, len(documents)),
-            show_progress=False,
-        )
+        query_vocabulary = {token_id: token for token, token_id in query_tokens.vocab.items()}
         relevance = {(q.query_id, q.document_id): q.relevance for q in qrels}
         run: list[ir_measures.ScoredDoc] = []
         query_evaluations: list[QueryEvaluation] = []
-        metric_rows = self._metric_rows(queries, document_ids, result_ids, scores, qrels)
+        document_indexes = {
+            document_id: index for index, document_id in enumerate(document_ids)
+        }
 
         for query_index, query in enumerate(queries):
+            candidate_ids = query.candidate_document_ids or document_ids
+            candidate_indexes = [document_indexes[document_id] for document_id in candidate_ids]
+            terms = [query_vocabulary[token_id] for token_id in query_tokens.ids[query_index]]
+            query_scores = retriever.get_scores(terms)
+            ranked_indexes = sorted(
+                candidate_indexes,
+                key=lambda index: (-float(query_scores[index]), document_ids[index]),
+            )[: self.top_k]
             hits: list[RankedHit] = []
-            for rank, (document_index, score) in enumerate(
-                zip(result_ids[query_index], scores[query_index], strict=True), start=1
-            ):
-                document_id = document_ids[int(document_index)]
-                score_value = float(score)
+            for rank, document_index in enumerate(ranked_indexes, start=1):
+                document_id = document_ids[document_index]
+                score_value = float(query_scores[document_index])
                 run.append(ir_measures.ScoredDoc(query.query_id, document_id, score_value))
                 hits.append(
                     RankedHit(
@@ -144,12 +149,23 @@ class BM25EvaluationHarness:
                     source_query=query.text,
                     normalised_query=normalised_queries[query_index],
                     hits=tuple(hits),
-                    metrics=metric_rows[query.query_id],
+                    metrics={},
                 )
             )
 
         qrel_records = [
             ir_measures.Qrel(q.query_id, q.document_id, q.relevance) for q in qrels
+        ]
+        metric_rows = self._metric_rows(queries, qrel_records, run)
+        query_evaluations = [
+            QueryEvaluation(
+                query_id=row.query_id,
+                source_query=row.source_query,
+                normalised_query=row.normalised_query,
+                hits=row.hits,
+                metrics=metric_rows[row.query_id],
+            )
+            for row in query_evaluations
         ]
         aggregate = {
             _metric_name(measure): float(value)
@@ -167,23 +183,11 @@ class BM25EvaluationHarness:
     @staticmethod
     def _metric_rows(
         queries: Sequence[RetrievalQuery],
-        document_ids: tuple[str, ...],
-        result_ids: Any,
-        scores: Any,
-        qrels: Sequence[RelevanceJudgement],
+        qrels: Sequence[ir_measures.Qrel],
+        run: Sequence[ir_measures.ScoredDoc],
     ) -> dict[str, dict[str, float]]:
-        qrel_records = [
-            ir_measures.Qrel(q.query_id, q.document_id, q.relevance) for q in qrels
-        ]
-        run = [
-            ir_measures.ScoredDoc(query.query_id, document_ids[int(document_index)], float(score))
-            for query_index, query in enumerate(queries)
-            for document_index, score in zip(
-                result_ids[query_index], scores[query_index], strict=True
-            )
-        ]
         rows = {query.query_id: {} for query in queries}
-        for item in ir_measures.iter_calc(_MEASURES, qrel_records, run):
+        for item in ir_measures.iter_calc(_MEASURES, qrels, run):
             rows[item.query_id][_metric_name(item.measure)] = float(item.value)
         return rows
 
@@ -208,6 +212,11 @@ class BM25EvaluationHarness:
             raise ValueError("query partition mismatch or split leakage")
         known_documents = set(document_ids)
         known_queries = set(query_ids)
+        for query in queries:
+            if len(query.candidate_document_ids) != len(set(query.candidate_document_ids)):
+                raise ValueError("duplicate candidate document ID")
+            if not set(query.candidate_document_ids).issubset(known_documents):
+                raise ValueError("query references an unknown candidate document")
         seen_qrels: set[tuple[str, str]] = set()
         for judgement in qrels:
             key = (judgement.query_id, judgement.document_id)
