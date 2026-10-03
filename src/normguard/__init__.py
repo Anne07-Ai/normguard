@@ -13,6 +13,7 @@ from .contracts import (
     SpanAction,
     SpanTrace,
 )
+from .esci_experiment import EsciPartition, load_partition
 from .experiment import PairedStatistics, paired_statistics, select_bm25_parameters
 from .normalisation import NormalisationResult, ProtectedNormaliser
 from .reporting import DecisionEvidence, EvidenceReporter, ExperimentReport
@@ -43,6 +44,7 @@ __all__ = [
     "C4SpacyAdapter",
     "Decision",
     "DecisionEvidence",
+    "EsciPartition",
     "EvidenceBundle",
     "EvidenceReporter",
     "ExperimentReport",
@@ -70,6 +72,7 @@ __all__ = [
     "SpanTrace",
     "TerminologySafetyAuditor",
     "compare_paired",
+    "load_partition",
     "paired_statistics",
     "select_bm25_parameters",
 ]
