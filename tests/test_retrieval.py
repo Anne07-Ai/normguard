@@ -63,6 +63,20 @@ class RetrievalHarnessTests(unittest.TestCase):
         self.assertEqual(comparison.query_ids, ("q1", "q2"))
         self.assertTrue(all(value == 0 for value in comparison.mean_deltas.values()))
 
+    def test_query_specific_candidate_set_excludes_global_documents(self) -> None:
+        queries = [
+            RetrievalQuery("q1", "blue hat", "development", ("d1", "d3")),
+        ]
+        result = self.harness.evaluate(
+            adapter=C0Adapter(),
+            documents=self.documents,
+            queries=queries,
+            qrels=[RelevanceJudgement("q1", "d3", 1)],
+            partition="development",
+        )
+        self.assertEqual({hit.document_id for hit in result.queries[0].hits}, {"d1", "d3"})
+        self.assertNotIn("d2", [hit.document_id for hit in result.queries[0].hits])
+
     def test_official_test_partition_is_rejected(self) -> None:
         queries = [RetrievalQuery("q1", "red shoe", "test")]
         with self.assertRaisesRegex(ValueError, "only calibration and development"):
