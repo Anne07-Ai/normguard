@@ -16,6 +16,7 @@ from .contracts import (
 from .esci_experiment import EsciPartition, load_partition
 from .experiment import PairedStatistics, paired_statistics, select_bm25_parameters
 from .normalisation import NormalisationResult, ProtectedNormaliser
+from .policy_io import LoadedPolicy, load_policy, require_development_approval
 from .reporting import DecisionEvidence, EvidenceReporter, ExperimentReport
 from .retrieval import (
     BM25EvaluationHarness,
@@ -50,6 +51,7 @@ __all__ = [
     "ExperimentReport",
     "Failure",
     "FailureCode",
+    "LoadedPolicy",
     "NormalisationAdapter",
     "NormalisationResult",
     "ObservedSpan",
@@ -73,7 +75,9 @@ __all__ = [
     "TerminologySafetyAuditor",
     "compare_paired",
     "load_partition",
+    "load_policy",
     "paired_statistics",
+    "require_development_approval",
     "select_bm25_parameters",
 ]
 

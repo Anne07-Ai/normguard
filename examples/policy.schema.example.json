@@ -1,0 +1,15 @@
+{
+  "policy_id": "replace-with-reviewed-policy-id",
+  "policy_version": "1.0.0",
+  "rules": [
+    {
+      "approved_output": null,
+      "match_type": "exact",
+      "pattern": "replace-with-reviewed-term",
+      "policy_class": "P0",
+      "rule_id": "replace-with-stable-rule-id",
+      "source": "replace-with-approval-source"
+    }
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,11 @@
+{
+  "evidence_sha256": "replace-with-64-character-calibration-evidence-sha256",
+  "partition": "calibration",
+  "policy_sha256": "replace-with-64-character-policy-sha256",
+  "reviewers": [
+    "replace-with-reviewer-one",
+    "replace-with-reviewer-two"
+  ],
+  "schema_version": 1,
+  "status": "approved"
+}
