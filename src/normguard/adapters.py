@@ -77,7 +77,11 @@ class C4SpacyAdapter:
         self._normaliser = ProtectedNormaliser(rules)
         self._nlp = nlp or self._load_model()
         self._metadata = AdapterMetadata(
-            configuration_id=f"C4-{morphology_profile}",
+            configuration_id=(
+                "C4"
+                if morphology_profile == "legacy-v0.1.0"
+                else f"C4-{morphology_profile}"
+            ),
             engine="spacy",
             engine_version=version("spacy"),
             model="en_core_web_sm",
