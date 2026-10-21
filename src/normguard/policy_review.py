@@ -39,7 +39,7 @@ def _rows(path: Path) -> list[dict[str, str]]:
 
 def _write_rows(path: Path, rows: list[dict[str, str]]) -> None:
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=_FIELDS, lineterminator="\\n")
+        writer = csv.DictWriter(handle, fieldnames=_FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -161,7 +161,7 @@ def merge_reviews(
     }
     report_path = output_dir / "policy-review-agreement.json"
     report_path.write_text(
-        json.dumps(report, indent=2, sort_keys=True) + "\\n", encoding="utf-8"
+        json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     return {
         **report,
