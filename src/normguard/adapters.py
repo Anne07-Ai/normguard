@@ -13,6 +13,7 @@ from .contracts import PolicyClass, PolicyRule, SpanAction, SpanTrace
 from .normalisation import NormalisationResult, ProtectedNormaliser
 
 _WHITESPACE = re.compile(r"\s+")
+_MORPHOLOGY_PROFILES = {"legacy-v0.1.0", "conservative-v0.2.0"}
 _MASKED_CLASSES = {
     PolicyClass.EXACT_PRESERVE,
     PolicyClass.APPROVED_ALIAS,
@@ -68,11 +69,19 @@ class C4SpacyAdapter:
         rules: Sequence[PolicyRule],
         *,
         nlp: Any | None = None,
+        morphology_profile: str = "legacy-v0.1.0",
     ) -> None:
+        if morphology_profile not in _MORPHOLOGY_PROFILES:
+            raise ValueError(f"unsupported morphology_profile: {morphology_profile}")
+        self._morphology_profile = morphology_profile
         self._normaliser = ProtectedNormaliser(rules)
         self._nlp = nlp or self._load_model()
         self._metadata = AdapterMetadata(
-            configuration_id="C4",
+            configuration_id=(
+                "C4"
+                if morphology_profile == "legacy-v0.1.0"
+                else f"C4-{morphology_profile}"
+            ),
             engine="spacy",
             engine_version=version("spacy"),
             model="en_core_web_sm",
@@ -107,7 +116,7 @@ class C4SpacyAdapter:
 
         for match in matches:
             token_index = self._emit_tokens(
-                text, tokens, token_index, cursor, match.start, chunks, traces
+                text, tokens, token_index, cursor, match.start, chunks, traces, matches
             )
             source = text[match.start : match.end]
             rule = match.rule
@@ -145,7 +154,9 @@ class C4SpacyAdapter:
             while token_index < len(tokens) and tokens[token_index].idx < match.end:
                 token_index += 1
 
-        self._emit_tokens(text, tokens, token_index, cursor, len(text), chunks, traces)
+        self._emit_tokens(
+            text, tokens, token_index, cursor, len(text), chunks, traces, matches
+        )
         output = _WHITESPACE.sub(" ", "".join(chunks)).strip()
         return NormalisationResult(text, output, tuple(traces), review_required)
 
@@ -158,6 +169,7 @@ class C4SpacyAdapter:
         end: int,
         chunks: list[str],
         traces: list[SpanTrace],
+        policy_matches: tuple[Any, ...],
     ) -> int:
         cursor = start
         while token_index < len(tokens):
@@ -172,7 +184,8 @@ class C4SpacyAdapter:
             source = text[token.idx:token_end]
             surface = unicodedata.normalize("NFC", source).casefold()
             lemma = unicodedata.normalize("NFC", token.lemma_ or surface).casefold()
-            emitted = lemma
+            preserve_reason = self._preserve_reason(text, token, policy_matches)
+            emitted = surface if preserve_reason else lemma
             chunks.append(emitted)
             traces.append(
                 SpanTrace(
@@ -187,13 +200,46 @@ class C4SpacyAdapter:
                     normalised_surface=surface,
                     part_of_speech=token.pos_ or None,
                     candidate_lemma=lemma,
-                    engine_metadata=self._engine_metadata(token=token),
+                    engine_metadata=self._engine_metadata(
+                        token=token,
+                        morphology_profile=self._morphology_profile,
+                        morphology_decision=preserve_reason or "lemmatise",
+                    ),
                 )
             )
             cursor = token_end
             token_index += 1
         chunks.append(unicodedata.normalize("NFC", text[cursor:end]))
         return token_index
+
+    def _preserve_reason(
+        self,
+        text: str,
+        token: Any,
+        policy_matches: tuple[Any, ...],
+    ) -> str | None:
+        """Return the auditable reason a token bypasses implicit morphology."""
+        if self._morphology_profile != "conservative-v0.2.0":
+            return None
+        if not token.tag_ or not token.pos_:
+            return "preserve-missing-linguistic-evidence"
+        if token.tag_ in {"NNS", "NNPS"}:
+            return "preserve-plural-product-noun"
+
+        token_start = token.idx
+        token_end = token.idx + len(token.text)
+        for match in policy_matches:
+            if match.rule.policy_class is PolicyClass.CONTEXT_NORMALISABLE:
+                continue
+            if token_end <= match.start:
+                separator = text[token_end : match.start]
+            elif match.end <= token_start:
+                separator = text[match.end : token_start]
+            else:
+                continue
+            if separator and re.fullmatch(r"[\\W_]*", separator):
+                return "preserve-policy-adjacent-token"
+        return None
 
     def _normalise_p2(
         self,
