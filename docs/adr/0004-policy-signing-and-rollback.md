@@ -36,7 +36,7 @@ This separation avoids circular serialization while preserving explicit control
 boundaries.
 
 ECDSA P-256/SHA-256 is supported by AWS KMS, Google Cloud KMS and Azure Key Vault,
-and public keys can be used for offline verification. genui{"citation":{"refs":["turn5search12","turn5search2","turn5search3"]}}
+and public keys can be used for offline verification. ([AWS KMS](https://docs.aws.amazon.com/kms/latest/developerguide/supported-algorithms.html), [Google Cloud KMS](https://cloud.google.com/kms/docs/algorithms), [Azure Key Vault](https://learn.microsoft.com/en-us/azure/key-vault/keys/about-keys-details)).
 
 ## Encoding
 
@@ -180,7 +180,7 @@ in the repository, policy bundle, trust store, container image, CI log or eviden
 Production signing should use a managed KMS/HSM. The private key remains inside the
 provider; the exported public key is converted once to the approved SPKI form and
 deployed through the trust-store workflow. AWS documents that asymmetric KMS
-public keys can be downloaded for external verification. genui{"citation":{"ref":"turn5search1"}}
+public keys can be downloaded for external verification. ([AWS KMS key specification guidance](https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html)).
 
 Tests use an explicitly labelled ephemeral or fixture-only key generated for the
 test process. No fixture private key is packaged in a release artifact.
@@ -197,7 +197,7 @@ interfaces and reject malformed DER.
 ### Ed25519
 
 Technically attractive and recommended by the `cryptography` documentation when
-legacy interoperability is not a concern. genui{"citation":{"ref":"turn5search0"}}
+legacy interoperability is not a concern. ([cryptography Ed25519 documentation](https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed25519/)).
 It was not selected as the required v1 algorithm because P-256/SHA-256 has the
 clearest common support across the project's AWS, Azure and GCP enterprise targets.
 
