@@ -46,3 +46,31 @@ type or frequency.
 Kaggle or other external data must not be added to these calibration outputs. If later used for
 robustness testing, keep it in a separate workflow with an explicit licence, provenance manifest,
 and distinct results. The official ESCI test partition remains sealed.
+
+
+## Merge independent pilot reviews
+
+Keep each completed reviewer worksheet private and separate. After both reviewers finish, merge them
+with the original pilot rather than copying columns manually:
+
+```bash
+uv run --locked python -m normguard.policy_review merge \\
+  ./artifacts/policy-pilot/policy-review-pilot.csv \\
+  ./artifacts/policy-pilot/lakshmi-review-completed.csv \\
+  ./artifacts/policy-pilot/padma-review-completed.csv \\
+  ./artifacts/policy-pilot/merged
+```
+
+The merge command fails closed if candidate IDs, row order, schema, or immutable evidence differ from
+the pilot. It also rejects incomplete classifications, missing evidence, cross-reviewer edits, and
+pre-populated resolution fields. It emits:
+
+- `policy-review-pilot-reviewed.csv`: both isolated reviewer decisions combined, with resolution
+  fields still empty.
+- `policy-review-agreement.json`: deterministic input/output digests, agreement rate, class-pair
+  counts, and explicit disagreement rows.
+
+The merge never resolves a disagreement. A human must populate `resolution_class` and
+`resolution_source` before the existing `resolve` command can create policy rules. For P1, the
+human must also provide the exact `approved_output`. Real review files and generated artifacts are
+local evidence and must not be committed.
