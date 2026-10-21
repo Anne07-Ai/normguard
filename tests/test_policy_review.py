@@ -61,7 +61,7 @@ class PolicyReviewTests(unittest.TestCase):
             row[f"reviewer_{reviewer}_class"] = "P0"
             row[f"reviewer_{reviewer}_source"] = f"reviewer {reviewer} evidence"
         with target.open("w", encoding="utf-8", newline="") as handle:
-            writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\\n")
+            writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
             writer.writeheader()
             writer.writerows(rows)
         return target
@@ -166,7 +166,7 @@ class PolicyReviewTests(unittest.TestCase):
                 rows = list(csv.DictReader(handle))
             rows[0]["reviewer_2_class"] = "P3"
             with second.open("w", encoding="utf-8", newline="") as handle:
-                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\\n")
+                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
                 writer.writeheader()
                 writer.writerows(rows)
             report = merge_reviews(pilot, first, second, root / "merged")
@@ -191,7 +191,7 @@ class PolicyReviewTests(unittest.TestCase):
                 rows = list(csv.DictReader(handle))
             rows[0]["surface"] = "tampered"
             with first.open("w", encoding="utf-8", newline="") as handle:
-                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\\n")
+                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
                 writer.writeheader()
                 writer.writerows(rows)
             with self.assertRaisesRegex(ValueError, "changed immutable evidence"):
@@ -200,7 +200,7 @@ class PolicyReviewTests(unittest.TestCase):
             rows[0]["surface"] = "brand-001"
             rows[0]["reviewer_2_class"] = "P0"
             with first.open("w", encoding="utf-8", newline="") as handle:
-                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\\n")
+                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
                 writer.writeheader()
                 writer.writerows(rows)
             with self.assertRaisesRegex(ValueError, "changed prohibited fields"):
@@ -218,7 +218,7 @@ class PolicyReviewTests(unittest.TestCase):
                 rows = list(csv.DictReader(handle))
             rows[0]["reviewer_2_source"] = ""
             with second.open("w", encoding="utf-8", newline="") as handle:
-                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\\n")
+                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
                 writer.writeheader()
                 writer.writerows(rows)
             with self.assertRaisesRegex(ValueError, "must provide evidence"):
