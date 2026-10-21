@@ -1,10 +1,11 @@
 import csv
+import json
 import tempfile
 import unittest
 from pathlib import Path
 
 from normguard.policy_io import load_policy
-from normguard.policy_review import generate_pilot, resolve_pilot
+from normguard.policy_review import generate_pilot, merge_reviews, resolve_pilot
 
 FIELDS = (
     "candidate_id", "candidate_type", "surface", "normalized_surface", "frequency",
@@ -47,6 +48,18 @@ class PolicyReviewTests(unittest.TestCase):
             row["reviewer_1_source"] = "catalogue evidence"
             row["reviewer_2_class"] = "P0"
             row["reviewer_2_source"] = "independent evidence"
+        with target.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
+            writer.writeheader()
+            writer.writerows(rows)
+        return target
+
+    def _isolated_review(self, source: Path, target: Path, reviewer: int) -> Path:
+        with source.open(encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        for row in rows:
+            row[f"reviewer_{reviewer}_class"] = "P0"
+            row[f"reviewer_{reviewer}_source"] = f"reviewer {reviewer} evidence"
         with target.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
             writer.writeheader()
@@ -116,6 +129,100 @@ class PolicyReviewTests(unittest.TestCase):
                     queue, reviewed, root / "pilot" / "policy-review-pilot-manifest.json",
                     root / "resolved", "retail-en-pilot", "0.1.0",
                 )
+
+    def test_merge_is_reproducible_and_reports_agreement(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            queue = self._queue(root / "queue.csv")
+            generate_pilot(queue, root / "pilot")
+            pilot = root / "pilot" / "policy-review-pilot.csv"
+            first = self._isolated_review(pilot, root / "first.csv", 1)
+            second = self._isolated_review(pilot, root / "second.csv", 2)
+            report_1 = merge_reviews(pilot, first, second, root / "merged-1")
+            report_2 = merge_reviews(pilot, first, second, root / "merged-2")
+            self.assertEqual(report_1, report_2)
+            self.assertEqual(report_1["agreements"], 100)
+            self.assertEqual(report_1["disagreements"], 0)
+            self.assertEqual(report_1["class_pair_counts"], {"P0:P0": 100})
+            self.assertEqual(
+                (root / "merged-1" / "policy-review-pilot-reviewed.csv").read_bytes(),
+                (root / "merged-2" / "policy-review-pilot-reviewed.csv").read_bytes(),
+            )
+            stored = json.loads(
+                (root / "merged-1" / "policy-review-agreement.json").read_text()
+            )
+            self.assertNotIn("outputs", stored)
+            self.assertEqual(stored["agreement_rate"], 1.0)
+
+    def test_merge_reports_disagreement_without_resolving_it(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            queue = self._queue(root / "queue.csv")
+            generate_pilot(queue, root / "pilot")
+            pilot = root / "pilot" / "policy-review-pilot.csv"
+            first = self._isolated_review(pilot, root / "first.csv", 1)
+            second = self._isolated_review(pilot, root / "second.csv", 2)
+            with second.open(encoding="utf-8", newline="") as handle:
+                rows = list(csv.DictReader(handle))
+            rows[0]["reviewer_2_class"] = "P3"
+            with second.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
+                writer.writeheader()
+                writer.writerows(rows)
+            report = merge_reviews(pilot, first, second, root / "merged")
+            self.assertEqual(report["disagreements"], 1)
+            self.assertEqual(report["disagreement_rows"][0]["candidate_id"], "brand-001")
+            with (root / "merged" / "policy-review-pilot-reviewed.csv").open(
+                encoding="utf-8", newline=""
+            ) as handle:
+                merged = list(csv.DictReader(handle))
+            self.assertEqual(merged[0]["resolution_class"], "")
+            self.assertEqual(merged[0]["resolution_source"], "")
+
+    def test_merge_rejects_tampering_and_reviewer_contamination(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            queue = self._queue(root / "queue.csv")
+            generate_pilot(queue, root / "pilot")
+            pilot = root / "pilot" / "policy-review-pilot.csv"
+            first = self._isolated_review(pilot, root / "first.csv", 1)
+            second = self._isolated_review(pilot, root / "second.csv", 2)
+            with first.open(encoding="utf-8", newline="") as handle:
+                rows = list(csv.DictReader(handle))
+            rows[0]["surface"] = "tampered"
+            with first.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
+                writer.writeheader()
+                writer.writerows(rows)
+            with self.assertRaisesRegex(ValueError, "changed immutable evidence"):
+                merge_reviews(pilot, first, second, root / "merged")
+
+            rows[0]["surface"] = "brand-001"
+            rows[0]["reviewer_2_class"] = "P0"
+            with first.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
+                writer.writeheader()
+                writer.writerows(rows)
+            with self.assertRaisesRegex(ValueError, "changed prohibited fields"):
+                merge_reviews(pilot, first, second, root / "merged")
+
+    def test_merge_rejects_incomplete_or_invalid_review(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            queue = self._queue(root / "queue.csv")
+            generate_pilot(queue, root / "pilot")
+            pilot = root / "pilot" / "policy-review-pilot.csv"
+            first = self._isolated_review(pilot, root / "first.csv", 1)
+            second = self._isolated_review(pilot, root / "second.csv", 2)
+            with second.open(encoding="utf-8", newline="") as handle:
+                rows = list(csv.DictReader(handle))
+            rows[0]["reviewer_2_source"] = ""
+            with second.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=FIELDS, lineterminator="\n")
+                writer.writeheader()
+                writer.writerows(rows)
+            with self.assertRaisesRegex(ValueError, "must provide evidence"):
+                merge_reviews(pilot, first, second, root / "merged")
 
 
 if __name__ == "__main__":

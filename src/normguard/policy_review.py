@@ -1,4 +1,4 @@
-"""Deterministic two-reviewer pilot generation and resolution."""
+"""Deterministic two-reviewer pilot generation, merge, and resolution."""
 
 from __future__ import annotations
 
@@ -22,6 +22,7 @@ _REVIEW = (
     "resolution_class", "approved_output", "resolution_source",
 )
 _FIELDS = (*_IMMUTABLE, *_REVIEW)
+_RESOLUTION = ("resolution_class", "approved_output", "resolution_source")
 
 
 def _rows(path: Path) -> list[dict[str, str]]:
@@ -34,6 +35,13 @@ def _rows(path: Path) -> list[dict[str, str]]:
     if len(ids) != len(set(ids)):
         raise ValueError(f"{path.name} contains duplicate candidate IDs")
     return rows
+
+
+def _write_rows(path: Path, rows: list[dict[str, str]]) -> None:
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=_FIELDS, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 def generate_pilot(queue_path: Path, output_dir: Path) -> dict[str, object]:
@@ -68,6 +76,100 @@ def generate_pilot(queue_path: Path, output_dir: Path) -> dict[str, object]:
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     return manifest
+
+
+def _validate_review(
+    pilot: list[dict[str, str]],
+    reviewed: list[dict[str, str]],
+    reviewer: int,
+) -> None:
+    if len(reviewed) != len(pilot):
+        raise ValueError(f"reviewer {reviewer} row count differs from the pilot")
+    expected_ids = [row["candidate_id"] for row in pilot]
+    actual_ids = [row["candidate_id"] for row in reviewed]
+    if actual_ids != expected_ids:
+        raise ValueError(f"reviewer {reviewer} candidate IDs or row order differ from the pilot")
+
+    own_class = f"reviewer_{reviewer}_class"
+    own_source = f"reviewer_{reviewer}_source"
+    other = 2 if reviewer == 1 else 1
+    forbidden = (f"reviewer_{other}_class", f"reviewer_{other}_source", *_RESOLUTION)
+    for original, row in zip(pilot, reviewed, strict=True):
+        candidate_id = row["candidate_id"]
+        if any(row[field] != original[field] for field in _IMMUTABLE):
+            raise ValueError(f"reviewer {reviewer} changed immutable evidence: {candidate_id}")
+        if any(row[field] != original[field] for field in forbidden):
+            raise ValueError(f"reviewer {reviewer} changed prohibited fields: {candidate_id}")
+        if row[own_class] not in _CLASSES:
+            raise ValueError(f"reviewer {reviewer} must classify {candidate_id} as P0-P3")
+        if not row[own_source].strip():
+            raise ValueError(f"reviewer {reviewer} must provide evidence for {candidate_id}")
+
+
+def merge_reviews(
+    pilot_path: Path,
+    reviewer_1_path: Path,
+    reviewer_2_path: Path,
+    output_dir: Path,
+) -> dict[str, object]:
+    """Validate and merge isolated reviews without resolving disagreements."""
+    pilot = _rows(pilot_path)
+    reviewer_1 = _rows(reviewer_1_path)
+    reviewer_2 = _rows(reviewer_2_path)
+    _validate_review(pilot, reviewer_1, 1)
+    _validate_review(pilot, reviewer_2, 2)
+
+    merged: list[dict[str, str]] = []
+    pair_counts: Counter[str] = Counter()
+    disagreements: list[dict[str, str]] = []
+    for original, first, second in zip(pilot, reviewer_1, reviewer_2, strict=True):
+        row = dict(original)
+        row["reviewer_1_class"] = first["reviewer_1_class"]
+        row["reviewer_1_source"] = first["reviewer_1_source"].strip()
+        row["reviewer_2_class"] = second["reviewer_2_class"]
+        row["reviewer_2_source"] = second["reviewer_2_source"].strip()
+        pair = f'{row["reviewer_1_class"]}:{row["reviewer_2_class"]}'
+        pair_counts[pair] += 1
+        if row["reviewer_1_class"] != row["reviewer_2_class"]:
+            disagreements.append({
+                "candidate_id": row["candidate_id"],
+                "surface": row["surface"],
+                "reviewer_1_class": row["reviewer_1_class"],
+                "reviewer_2_class": row["reviewer_2_class"],
+            })
+        merged.append(row)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    reviewed_path = output_dir / "policy-review-pilot-reviewed.csv"
+    _write_rows(reviewed_path, merged)
+    candidate_count = len(merged)
+    agreements = candidate_count - len(disagreements)
+    report: dict[str, object] = {
+        "schema_version": 1,
+        "partition": "calibration",
+        "official_test_status": "sealed-not-read-or-transformed",
+        "pilot_sha256": sha256_file(pilot_path),
+        "reviewer_1_sha256": sha256_file(reviewer_1_path),
+        "reviewer_2_sha256": sha256_file(reviewer_2_path),
+        "reviewed_pilot_sha256": sha256_file(reviewed_path),
+        "candidate_count": candidate_count,
+        "agreements": agreements,
+        "disagreements": len(disagreements),
+        "agreement_rate": agreements / candidate_count if candidate_count else 0.0,
+        "class_pair_counts": dict(sorted(pair_counts.items())),
+        "disagreement_rows": disagreements,
+    }
+    report_path = output_dir / "policy-review-agreement.json"
+    report_path.write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return {
+        **report,
+        "outputs": {
+            reviewed_path.name: {"sha256": sha256_file(reviewed_path)},
+            report_path.name: {"sha256": sha256_file(report_path)},
+        },
+    }
 
 
 def resolve_pilot(
@@ -160,6 +262,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     pilot = commands.add_parser("pilot")
     pilot.add_argument("queue", type=Path)
     pilot.add_argument("output_dir", type=Path)
+    merge = commands.add_parser("merge")
+    merge.add_argument("pilot", type=Path)
+    merge.add_argument("reviewer_1", type=Path)
+    merge.add_argument("reviewer_2", type=Path)
+    merge.add_argument("output_dir", type=Path)
     resolve = commands.add_parser("resolve")
     resolve.add_argument("queue", type=Path)
     resolve.add_argument("reviewed_pilot", type=Path)
@@ -170,6 +277,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "pilot":
         result = generate_pilot(args.queue, args.output_dir)
+    elif args.command == "merge":
+        result = merge_reviews(args.pilot, args.reviewer_1, args.reviewer_2, args.output_dir)
     else:
         result = resolve_pilot(
             args.queue, args.reviewed_pilot, args.pilot_manifest, args.output_dir,
