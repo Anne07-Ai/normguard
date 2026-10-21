@@ -25,7 +25,7 @@ from .retrieval import BM25EvaluationHarness, RetrievalEvaluation, compare_paire
 from .safety import ObservedSpan, SafetyCase, TerminologySafetyAuditor
 
 PROTOCOL_ID = "NG-POC-001"
-PROTOCOL_VERSION = "0.1.0"
+PROTOCOL_VERSION = "0.2.0"
 STATISTICS_SEED = 7
 _GRID = tuple((k1, b) for k1 in (0.6, 0.9, 1.2, 1.5) for b in (0.25, 0.5, 0.75))
 
@@ -101,7 +101,9 @@ def run_experiment(
 ) -> dict[str, object]:
     """Run paired retrieval, statistics, safety gates and evidence reporting."""
     baseline_adapter = C0Adapter()
-    candidate_adapter = C4SpacyAdapter(policy.rules)
+    candidate_adapter = C4SpacyAdapter(
+        policy.rules, morphology_profile="conservative-v0.2.0"
+    )
     k1, b = _select_parameters(data, baseline_adapter)
     baseline = _evaluate(data, baseline_adapter, k1, b)
     candidate = _evaluate(data, candidate_adapter, k1, b)
@@ -122,11 +124,13 @@ def run_experiment(
                 if trace.rule_id is not None
             ),
         ))
-    safety = TerminologySafetyAuditor(policy.rules).audit(configuration_id="C4", cases=cases)
+    safety = TerminologySafetyAuditor(policy.rules).audit(configuration_id=candidate_adapter.metadata.configuration_id, cases=cases)
     baseline_latency = _latency_ms(baseline_adapter, texts)
     candidate_latency = _latency_ms(candidate_adapter, texts)
     baseline_manifest = _manifest("C0", _digest({"configuration": "C0"}), data)
-    candidate_manifest = _manifest("C4", policy.sha256, data)
+    candidate_manifest = _manifest(
+        candidate_adapter.metadata.configuration_id, policy.sha256, data
+    )
     reporter = EvidenceReporter()
     report = reporter.build(
         baseline_manifest=baseline_manifest,
