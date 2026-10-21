@@ -87,8 +87,8 @@ class AdapterTests(unittest.TestCase):
 
     def test_conservative_v020_keeps_explicit_p2_authority(self) -> None:
         adapter = C4SpacyAdapter(self.rules, morphology_profile="conservative-v0.2.0")
-        result = adapter.normalise("running shoes")
-        self.assertEqual(result.output_text, "run shoes")
+        result = adapter.normalise("women are running")
+        self.assertEqual(result.output_text, "women be run")
         running = next(span for span in result.spans if span.rule_id == "p2")
         self.assertEqual(running.action, SpanAction.TRANSFORMED)
 
