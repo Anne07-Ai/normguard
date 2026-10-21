@@ -64,6 +64,38 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual(self.c4.metadata.model_version, "3.8.0")
         self.assertEqual(self.c4.metadata.disabled_components, ("parser", "ner"))
 
+    def test_conservative_v020_preserves_plural_product_nouns(self) -> None:
+        adapter = C4SpacyAdapter(self.rules, morphology_profile="conservative-v0.2.0")
+        fixtures = {
+            "wooden beads for crafts": "wooden beads for crafts",
+            "superman toddler slippers": "superman toddler slippers",
+            "dr brown bags": "dr brown bags",
+            "color contacts lenses": "color contacts lenses",
+            "nike joggers women": "nike joggers women",
+        }
+        for source, expected in fixtures.items():
+            with self.subTest(source=source):
+                result = adapter.normalise(source)
+                self.assertEqual(result.output_text, expected)
+                preserved = [
+                    span
+                    for span in result.spans
+                    if span.engine_metadata.get("morphology_decision")
+                    == "preserve-plural-product-noun"
+                ]
+                self.assertTrue(preserved)
+
+    def test_conservative_v020_keeps_explicit_p2_authority(self) -> None:
+        adapter = C4SpacyAdapter(self.rules, morphology_profile="conservative-v0.2.0")
+        result = adapter.normalise("running shoes")
+        self.assertEqual(result.output_text, "run shoes")
+        running = next(span for span in result.spans if span.rule_id == "p2")
+        self.assertEqual(running.action, SpanAction.TRANSFORMED)
+
+    def test_conservative_v020_rejects_unknown_profile(self) -> None:
+        with self.assertRaisesRegex(ValueError, "unsupported morphology_profile"):
+            C4SpacyAdapter(self.rules, morphology_profile="future")
+
 
 if __name__ == "__main__":
     unittest.main()
