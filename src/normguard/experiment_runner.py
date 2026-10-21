@@ -124,7 +124,10 @@ def run_experiment(
                 if trace.rule_id is not None
             ),
         ))
-    safety = TerminologySafetyAuditor(policy.rules).audit(configuration_id=candidate_adapter.metadata.configuration_id, cases=cases)
+    safety = TerminologySafetyAuditor(policy.rules).audit(
+        configuration_id=candidate_adapter.metadata.configuration_id,
+        cases=cases,
+    )
     baseline_latency = _latency_ms(baseline_adapter, texts)
     candidate_latency = _latency_ms(candidate_adapter, texts)
     baseline_manifest = _manifest("C0", _digest({"configuration": "C0"}), data)
