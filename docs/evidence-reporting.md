@@ -47,3 +47,18 @@ Diagnostics are descriptive. They do not change the primary thresholds, establis
 authorize development, or permit subgroup selection as the primary result. The allowed next
 decision is either one explicitly versioned calibration refinement followed by a complete rerun, or
 stopping the POC and recording that the utility hypothesis was not supported.
+
+
+## Conservative calibration refinement v0.2.0
+
+Issue #54 introduces an explicit `conservative-v0.2.0` morphology profile while retaining
+`legacy-v0.1.0` for historical reproduction. The experiment runner declares protocol v0.2.0
+and records `C4-conservative-v0.2.0` as the candidate configuration.
+
+The conservative profile preserves implicit plural common and proper nouns, fails closed when
+required POS evidence is unavailable, and preserves tokens directly adjacent to non-P2 policy
+spans. Explicit reviewed P2 rules retain authority to apply morphology. Every implicit decision
+is recorded in span engine metadata as either `lemmatise` or a concrete preservation reason.
+
+This is the single post-diagnostic refinement. It does not change the reviewed policy, decision
+thresholds, dataset split, statistical seed, or final-test seal.
