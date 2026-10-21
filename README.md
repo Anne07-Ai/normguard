@@ -2,131 +2,143 @@
 
 ![NormGuard — text normalisation, measured before it ships](docs/assets/normguard-banner.svg)
 
-[![Phase](https://img.shields.io/badge/phase-1%20research-0f766e?style=for-the-badge)](research/charter.md)
-[![Status](https://img.shields.io/badge/status-validating-f59e0b?style=for-the-badge)](research/landscape.md)
+[![Phase](https://img.shields.io/badge/phase-2%20complete-0f766e?style=for-the-badge)](docs/adr/0002-stop-general-lemmatisation.md)
+[![Decision](https://img.shields.io/badge/decision-utility%20not%20supported-b45309?style=for-the-badge)](docs/adr/0002-stop-general-lemmatisation.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-334155?style=for-the-badge)](LICENSE)
 
-**A proposed domain-aware quality gate for text normalisation in Search, NLP and RAG systems.**
+**An evidence-first quality and safety research toolkit for text normalisation in search, NLP and RAG pipelines.**
 
-[Research charter](research/charter.md) · [Landscape](research/landscape.md) · [Evaluation plan](research/evaluation-plan.md) · [Architecture](docs/architecture.md) · [Contributing](CONTRIBUTING.md)
-
-[Pinned ESCI dataset protocol](docs/esci-dataset.md)
+[Final decision](docs/adr/0002-stop-general-lemmatisation.md) ·
+[Architecture](docs/architecture.md) ·
+[Evaluation protocol](research/evaluation-plan.md) ·
+[ESCI protocol](docs/esci-dataset.md) ·
+[Contributing](CONTRIBUTING.md)
 
 </div>
 
 > [!IMPORTANT]
-> NormGuard is in research validation. It is not yet a released library, and this repository does not claim a novel algorithm or proven retrieval improvement.
+> NormGuard completed a focused proof of concept. Its protected-terminology safety
+> controls passed, but the evaluated general-lemmatisation approach did not achieve
+> the pre-registered retrieval-utility gates. It is not approved as a production
+> retrieval recommendation.
 
-## The decision NormGuard aims to improve
+## Research outcome
 
-Stemming and lemmatisation are easy to enable. Their downstream consequences are harder to justify.
+NormGuard tested whether policy-first English lemmatisation could improve lexical
+BM25 retrieval while preserving terminology whose exact form matters.
 
-A transformation may improve lexical matching, do nothing for dense retrieval, or corrupt a term whose exact form matters. NormGuard investigates whether developers can evaluate those trade-offs before a pipeline reaches production.
+Two governed experiments were completed on the frozen Amazon ESCI calibration
+partition:
 
-| Domain | Input | Candidate output | Diagnostic |
-|---|---|---|---|
-| Cybersecurity | `vulnerabilities` | `vulnerability` | plausible domain lemma |
-| Medical | `diagnoses` | `diagnosis` | plausible medical lemma |
-| Retail | `SKU-AX2048` | unchanged | protected product identifier |
-| Cross-domain risk | `organization` | `organ` | harmful over-stemming to reject |
+| Measure | v0.1.0 | v0.2.0 conservative refinement |
+|---|---:|---:|
+| C0 nDCG@10 | 0.812533 | 0.812533 |
+| C4 nDCG@10 | 0.814379 | 0.813144 |
+| Mean paired delta | +0.001846 | +0.000611 |
+| CI95 lower bound | -0.000913 | -0.000811 |
+| Exact identifier retention | 1.000000 | 1.000000 |
+| Protected-term violation rate | 0.000000 | 0.000000 |
+| S0 events | 0 | 0 |
+| Decision | REVIEW | REVIEW |
 
-## Proposed quality loop
+The required utility gain was at least `+0.005` with a CI95 lower bound above
+zero. Neither configuration passed. The single permitted refinement reduced the
+estimated gain, so further tuning on the frozen calibration partition was stopped.
 
-```mermaid
-flowchart LR
-    A["Dataset + expected relevance"] --> B["Candidate pipelines"]
-    B --> C["Matched retrieval runs"]
-    C --> D["Utility + safety evidence"]
-    D --> E{"Decision"}
-    E -->|passes| F["Recommended configuration"]
-    E -->|trade-off| G["Pareto set / review"]
-    E -->|regression| H["Block change"]
-```
+Development and official-test partitions remained sealed and were not read or
+transformed. See
+[ADR 0002](docs/adr/0002-stop-general-lemmatisation.md) for the accepted decision,
+limitations and rejected alternatives.
 
-The intended output is not always a winner. A defensible **inconclusive** result is better than an unsupported recommendation.
+## What the repository demonstrates
 
-## What may become distinctive
+The negative utility result does not invalidate the independently tested engineering
+and governance controls:
 
-Existing libraries already implement text-processing algorithms. NormGuard's proposed contribution is the quality layer around them:
+- deterministic P0–P3 protected-term policies;
+- policy-first normalisation with offset-preserving span traces;
+- pinned C0 and spaCy-backed C4 adapters;
+- deterministic ESCI split and artifact verification;
+- paired BM25 retrieval evaluation and statistical evidence;
+- terminology-safety auditing and explicit failure taxonomy;
+- two-reviewer policy review, merge and resolution workflow;
+- tamper-evident JSON, Markdown and SVG reports;
+- calibration diagnostics that fail closed;
+- CI checks using locked dependencies and reproducible tests.
 
-- compare no-normalisation, stemming and lemmatisation baselines;
-- evaluate lexical, dense, hybrid and RAG retrieval separately;
-- detect changes to protected domain terminology;
-- report harmful over-normalisation examples;
-- recommend only when declared utility and safety thresholds pass;
-- run the same checks as a CI regression gate;
-- preserve machine-readable evidence behind every decision.
-
-These are hypotheses to validate, not completed features.
-
-## Phase 1 research map
+## Decision flow
 
 ```mermaid
 flowchart TD
-    A["Existing tools and papers"] --> D["Evidence matrix"]
-    B["Developer workflows"] --> D
-    C["Datasets and metrics"] --> D
-    D --> E["Defensible gap?"]
-    E -->|yes| F["Freeze proof-of-concept protocol"]
-    E -->|narrow| G["Reposition scope"]
-    E -->|no| H["Stop with documented findings"]
+    A["Frozen calibration protocol"] --> B["v0.1.0 experiment"]
+    B --> C{"Utility gates pass?"}
+    C -->|No| D["One governed refinement"]
+    D --> E["v0.2.0 experiment"]
+    E --> F{"Utility gates pass?"}
+    F -->|No| G["STOP: hypothesis not supported"]
+    G --> H["Development and final test remain sealed"]
 ```
 
-### Phase 1 outputs
+Safety passing was necessary but not sufficient for promotion. NormGuard deliberately
+records a defensible negative result instead of converting descriptive improvements
+into an unsupported recommendation.
 
-- [ ] sourced competitor and literature matrix;
-- [ ] three concrete developer workflows;
-- [ ] dataset and licensing assessment;
-- [ ] frozen benchmark and statistical plan;
-- [ ] terminology-safety taxonomy;
-- [ ] novelty and feasibility decision;
-- [ ] go, narrow, reposition, or stop recommendation.
+## Core commands
 
-## Initial measurement model
+Install the locked development environment and run the contract suite:
 
-| Dimension | Example measures | Why it matters |
-|---|---|---|
-| Retrieval utility | Recall@k, nDCG@k, MRR | determines whether useful evidence is found |
-| Terminology safety | corruption rate, protected-term violations | prevents damage to exact domain meaning |
-| Efficiency | p50/p95 latency, memory, index size | exposes operational cost |
-| Transformation behaviour | vocabulary reduction, error taxonomy | explains why performance changed |
-| Uncertainty | confidence intervals, per-domain variance | prevents false certainty |
+```bash
+uv sync --locked --all-extras --dev
+uv run --locked ruff check src tests scripts
+uv run --locked python -m unittest discover -s tests -v
+```
 
-LLM token savings are not assumed. They will be measured only where the tokenizer and downstream workflow make the comparison meaningful.
-
-## Research architecture
-
-![Research architecture is documented with its trust boundary and proposed components](https://img.shields.io/badge/architecture-proposed-334155?style=flat-square)
-
-The proposed experiment accepts documents, queries and relevance labels; validates them; runs matched candidate pipelines; measures retrieval utility and terminology safety; and returns a recommendation, Pareto set, or inconclusive result.
-
-See the [architecture document](docs/architecture.md) for the complete diagram and trust boundary.
-
-## Visual evidence standard
-
-NormGuard uses a restrained diagnostic identity: ink and slate for structure, teal for verified-safe outcomes, amber for uncertainty, and red for regressions. Charts require labelled axes, units, sample size, uncertainty and traceable source data.
-
-See the [visual system](docs/visual-system.md).
+The repository contains guarded calibration/development tooling, but ADR 0002
+prohibits additional tuning against the completed calibration partition and does
+not authorize development or official-test access.
 
 ## Repository map
 
 ```text
+src/normguard/
+  adapters.py                  C0 and policy-aware spaCy adapters
+  calibration_diagnostics.py  guarded descriptive diagnostics
+  contracts.py                 policy, trace, failure and evidence contracts
+  esci.py                      ESCI artifact verification and split manifest
+  esci_experiment.py           sealed partition loading
+  experiment.py                deterministic paired statistics
+  experiment_runner.py         guarded experiment orchestration
+  normalisation.py             policy-first protected normalisation
+  policy_candidates.py         calibration-only review candidate generation
+  policy_io.py                 policy and approval validation
+  policy_review.py             two-reviewer merge and resolution
+  reporting.py                 decisions and tamper-evident reports
+  retrieval.py                 paired BM25 evaluation
+  safety.py                    terminology-safety auditing
 docs/
-  architecture.md       proposed system and trust boundary
-  visual-system.md      visual and chart quality rules
-  assets/               versioned visual assets
+  adr/                         accepted architecture and research decisions
+  evidence-reporting.md        reporting and diagnostic contracts
+  policy-candidate-review.md   reviewer workflow
+  protected-normalisation.md   safety semantics
+  retrieval-evaluation.md      retrieval protocol
+  terminology-safety-audit.md  failure and safety model
 research/
-  charter.md            questions, hypotheses and exit criteria
-  landscape.md          existing solutions and closest overlap
-  evaluation-plan.md    metrics, controls and planned figures
-CONTRIBUTING.md         evidence and pull-request standards
+  charter.md                   original research questions
+  evaluation-plan.md           frozen evaluation plan
+  landscape.md                 prior-art and product landscape
+tests/                         deterministic contract and regression tests
 ```
 
-## Collaboration
+## Future product boundary
 
-Work happens through focused issues, feature branches and reviewed pull requests. During Phase 1, evidence quality takes priority over implementation volume.
+A future **NormGuard Safety Core** may productize the reusable policy, trace,
+review, safety-audit and evidence components for search, RAG and LLM preprocessing
+systems. That would be a separate product phase with its own users, API contract,
+threat model, success measures and release criteria.
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before starting a research task.
+Any new retrieval experiment requires a new protocol and a new data boundary. It
+must not reuse the completed calibration partition for exploratory tuning or imply
+that the rejected general-lemmatisation hypothesis has been revived.
 
 ## Licence
 
