@@ -16,6 +16,7 @@ from .contracts import (
 from .esci_experiment import EsciPartition, load_partition
 from .experiment import PairedStatistics, paired_statistics, select_bm25_parameters
 from .normalisation import NormalisationResult, ProtectedNormaliser
+from .policy_candidates import PolicyCandidate, generate_policy_candidates, write_candidate_review
 from .policy_io import LoadedPolicy, load_policy, require_development_approval
 from .reporting import DecisionEvidence, EvidenceReporter, ExperimentReport
 from .retrieval import (
@@ -57,6 +58,7 @@ __all__ = [
     "ObservedSpan",
     "PairedComparison",
     "PairedStatistics",
+    "PolicyCandidate",
     "PolicyClass",
     "PolicyRule",
     "ProtectedNormaliser",
@@ -74,11 +76,13 @@ __all__ = [
     "SpanTrace",
     "TerminologySafetyAuditor",
     "compare_paired",
+    "generate_policy_candidates",
     "load_partition",
     "load_policy",
     "paired_statistics",
     "require_development_approval",
     "select_bm25_parameters",
+    "write_candidate_review",
 ]
 
 __version__ = "0.1.0"

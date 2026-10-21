@@ -27,6 +27,7 @@ class EsciPartition:
     queries: tuple[RetrievalQuery, ...]
     qrels: tuple[RelevanceJudgement, ...]
     split_manifest_sha256: str
+    document_brands: tuple[tuple[str, str], ...] = ()
 
 
 def _verified_assignments(artifact_dir: Path, partition: str) -> set[tuple[str, str]]:
@@ -98,7 +99,7 @@ def load_partition(dataset_dir: Path, artifact_dir: Path, partition: str) -> Esc
 
     product_rows = pq.read_table(
         dataset_dir / "shopping_queries_dataset_products.parquet",
-        columns=["product_id", "product_locale", "product_title"],
+        columns=["product_id", "product_locale", "product_title", "product_brand"],
         filters=[("product_locale", "=", "us")],
     ).to_pylist()
     documents = tuple(
@@ -107,12 +108,19 @@ def load_partition(dataset_dir: Path, artifact_dir: Path, partition: str) -> Esc
     )
     if {item.document_id for item in documents} != {f"us:{item}" for item in product_ids}:
         raise ValueError("one or more candidate products are missing")
+    document_brands = tuple(sorted(
+        (f'us:{row["product_id"]}', str(row["product_brand"]).strip())
+        for row in product_rows
+        if str(row["product_id"]) in product_ids and row["product_brand"]
+    ))
     queries = tuple(
         RetrievalQuery(query_id, query_text[query_id], partition, tuple(candidates[query_id]))
         for query_id in sorted(query_text)
     )
     manifest_digest = sha256_file(artifact_dir / "split-manifest.json")
-    return EsciPartition(partition, documents, queries, tuple(qrels), manifest_digest)
+    return EsciPartition(
+        partition, documents, queries, tuple(qrels), manifest_digest, document_brands
+    )
 
 
 def main(argv: Sequence[str] | None = None) -> int:
