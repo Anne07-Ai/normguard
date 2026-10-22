@@ -18,6 +18,14 @@ from .experiment import PairedStatistics, paired_statistics, select_bm25_paramet
 from .normalisation import NormalisationResult, ProtectedNormaliser
 from .policy_io import LoadedPolicy, load_policy, require_development_approval
 from .reporting import DecisionEvidence, EvidenceReporter, ExperimentReport
+from .runtime import (
+    BoundedSafetyRuntime,
+    RuntimeCode,
+    RuntimeFailure,
+    RuntimeLimit,
+    RuntimeLimits,
+    RuntimeResult,
+)
 from .retrieval import (
     BM25EvaluationHarness,
     PairedComparison,
@@ -41,6 +49,7 @@ __all__ = [
     "AdapterMetadata",
     "AuditFinding",
     "BM25EvaluationHarness",
+    "BoundedSafetyRuntime",
     "C0Adapter",
     "C4SpacyAdapter",
     "Decision",
@@ -67,6 +76,11 @@ __all__ = [
     "RetrievalEvaluation",
     "RetrievalQuery",
     "RunManifest",
+    "RuntimeCode",
+    "RuntimeFailure",
+    "RuntimeLimit",
+    "RuntimeLimits",
+    "RuntimeResult",
     "SafetyAuditResult",
     "SafetyCase",
     "Severity",
