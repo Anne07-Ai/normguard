@@ -21,6 +21,9 @@ dependencies = [
   "spacy==3.8.16",
 ]
 
+[project.scripts]
+normguard = "normguard.cli:main"
+
 [project.optional-dependencies]
 esci = ["pyarrow>=18,<22"]
 
