@@ -10,7 +10,6 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from normguard import cli
-from normguard.contracts import PolicyClass
 from normguard.safety_contracts import DecisionEvidence, EvidenceStatus
 from normguard.sdk import SDKError
 
