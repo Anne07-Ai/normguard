@@ -56,3 +56,43 @@ uv run --locked python -m unittest discover -s tests -v
 The tests cover deterministic serialization, strict nested schemas, digest
 tampering, duplicate rules, two-reviewer binding, compatibility failure and
 privacy-safe evidence.
+
+
+## Bounded runtime SDK
+
+`BoundedSafetyRuntime` accepts only a `VerifiedPolicy`. It never loads, repairs,
+discovers or implicitly trusts a raw policy bundle. Construction validates
+policy-owned limits before compiling matchers; each call validates request-owned
+limits before returning a result.
+
+```python
+runtime = BoundedSafetyRuntime(
+    verified_policy,
+    limits=RuntimeLimits(
+        max_input_bytes=65_536,
+        max_rules=10_000,
+        max_pattern_characters=1_024,
+        max_matches=10_000,
+        max_output_bytes=131_072,
+        max_evidence_spans=20_000,
+        max_safety_events=1_000,
+    ),
+)
+result = runtime.normalise(text)
+```
+
+Hard limit failures are atomic: callers receive a typed `RuntimeFailure` and no
+partial output. Error text contains only a stable code, limit name and policy ID.
+The default evidence includes digests, byte counts, rule IDs, offsets, classes,
+actions and review events; it excludes raw input, raw output, key material and
+signatures.
+
+The runtime deliberately uses identity morphology. P0 is preserved exactly, P1
+emits only its approved alias, P3 is preserved with review-required status, and P2
+is preserved until a separately governed explicit transformation contract exists.
+This does not revive the stopped general-lemmatisation hypothesis.
+
+Decision IDs are deterministic hashes of the runtime version, verified policy
+digest, input digest and limit configuration. Timing is excluded from semantic
+evidence in this slice so repeated calls are byte reproducible. Runtime and policy
+objects are immutable and may be shared for concurrent read-only calls.
