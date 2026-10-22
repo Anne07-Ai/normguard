@@ -194,8 +194,9 @@ def _policy_documents(
     }
 
 
-def _emit(value: dict[str, Any], *, stream: Any = sys.stdout) -> None:
-    stream.write(
+def _emit(value: dict[str, Any], *, stream: Any | None = None) -> None:
+    selected_stream = sys.stdout if stream is None else stream
+    selected_stream.write(
         json.dumps(
             value,
             ensure_ascii=False,
