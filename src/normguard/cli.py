@@ -267,12 +267,6 @@ def _run(args: argparse.Namespace) -> ExitCode:
     if args.max_input_bytes < 1:
         raise SDKError("INVALID_ARGUMENT", limit="input_bytes")
     runtime_limits = RuntimeLimits(max_input_bytes=args.max_input_bytes)
-    core = build_safety_core(
-        **documents,
-        verification_time=verification_time,
-        document_limits=document_limits,
-        runtime_limits=runtime_limits,
-    )
     raw_input = (
         _read_stdin(runtime_limits.max_input_bytes)
         if args.stdin
@@ -286,6 +280,12 @@ def _run(args: argparse.Namespace) -> ExitCode:
         text = raw_input.decode("utf-8", errors="strict")
     except UnicodeDecodeError:
         raise SDKError("INVALID_INPUT_ENCODING", document="input") from None
+    core = build_safety_core(
+        **documents,
+        verification_time=verification_time,
+        document_limits=document_limits,
+        runtime_limits=runtime_limits,
+    )
     result = core.normalise(text)
     _emit(
         {
