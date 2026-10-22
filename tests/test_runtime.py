@@ -59,9 +59,8 @@ def _limits(**changes: int) -> RuntimeLimits:
 class RuntimeLimitContractTests(unittest.TestCase):
     def test_limits_are_positive_integers_and_immutable(self) -> None:
         for invalid in (0, -1, True, 1.5):
-            with self.subTest(invalid=invalid):
-                with self.assertRaises(ValueError):
-                    RuntimeLimits(max_input_bytes=invalid)  # type: ignore[arg-type]
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                RuntimeLimits(max_input_bytes=invalid)  # type: ignore[arg-type]
         limits = RuntimeLimits()
         with self.assertRaises(AttributeError):
             limits.max_rules = 1  # type: ignore[misc]
