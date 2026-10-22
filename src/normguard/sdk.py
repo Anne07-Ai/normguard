@@ -12,7 +12,6 @@ from .policy_verification import (
     PolicyVerificationError,
     RollbackAuthorization,
     TrustStore,
-    VerificationCode,
     VerifiedPolicy,
     verify_policy_bundle,
 )
