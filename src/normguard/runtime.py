@@ -194,7 +194,11 @@ class BoundedSafetyRuntime:
             policy_id,
         )
 
-        safety_events = ("review-required",) if normalised.review_required else ()
+        safety_events = tuple(
+            f"review-required:{span.rule_id}"
+            for span in normalised.spans
+            if span.rule_id is not None and span.action.value == "review"
+        )
         self._check_limit(
             len(safety_events),
             self._limits.max_safety_events,
