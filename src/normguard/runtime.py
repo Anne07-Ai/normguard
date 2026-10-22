@@ -97,7 +97,7 @@ class BoundedSafetyRuntime:
     resources before processing and return no partial result on failure.
     """
 
-    __slots__ = ("_limits", "_normaliser", "_verified_policy", "_frozen")
+    __slots__ = ("_frozen", "_limits", "_normaliser", "_verified_policy")
 
     def __init__(
         self,
