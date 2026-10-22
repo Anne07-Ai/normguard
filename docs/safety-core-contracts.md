@@ -96,3 +96,37 @@ Decision IDs are deterministic hashes of the runtime version, verified policy
 digest, input digest and limit configuration. Timing is excluded from semantic
 evidence in this slice so repeated calls are byte reproducible. Runtime and policy
 objects are immutable and may be shared for concurrent read-only calls.
+
+
+## Stable SDK facade
+
+Application code should import the public facade rather than internal parsers:
+
+```python
+from datetime import UTC, datetime
+
+from normguard import RuntimeLimits, build_safety_core
+
+core = build_safety_core(
+    policy_bundle_bytes,
+    trust_store_bytes,
+    activation_state_bytes,
+    verification_time=datetime.now(UTC),
+    runtime_limits=RuntimeLimits(max_input_bytes=65_536),
+)
+result = core.normalise(text)
+```
+
+The three required documents and optional rollback documents must be UTF-8 JSON
+`bytes`. `SDKDocumentLimits` rejects oversized documents before decoding.
+Duplicate keys, non-finite constants, malformed UTF-8, non-object roots and unknown
+closed-schema fields fail without fallback.
+
+`SDKError` is the single public failure boundary. Its `code` preserves the
+underlying verifier or runtime code, while its message contains only safe document,
+policy, key and limit identifiers. Verification time is required explicitly so
+tests and deployments do not depend on an undeclared wall clock.
+
+The SDK is versioned as `0.1.0` with schema version `1`. CLI and service
+adapters must delegate to this facade rather than duplicate parsing, trust or
+runtime semantics.
