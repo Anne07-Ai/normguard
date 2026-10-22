@@ -46,6 +46,8 @@ from .safety import (
 )
 
 __all__ = [
+    "SDK_SCHEMA_VERSION",
+    "SDK_VERSION",
     "AdapterMetadata",
     "AuditFinding",
     "BM25EvaluationHarness",
@@ -81,18 +83,23 @@ __all__ = [
     "RuntimeLimit",
     "RuntimeLimits",
     "RuntimeResult",
+    "SDKDocumentLimits",
+    "SDKError",
     "SafetyAuditResult",
     "SafetyCase",
+    "SafetyCore",
     "Severity",
     "SpanAction",
     "SpanTrace",
     "TerminologySafetyAuditor",
+    "build_safety_core",
     "compare_paired",
     "load_partition",
     "load_policy",
     "paired_statistics",
     "require_development_approval",
     "select_bm25_parameters",
+    "verify_policy",
 ]
 
 __version__ = "0.1.0"
