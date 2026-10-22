@@ -19,11 +19,11 @@ from normguard.safety_contracts import (
     canonical_json_bytes,
 )
 from normguard.sdk import (
-    SDKDocumentLimits,
-    SDKError,
     SDK_SCHEMA_VERSION,
     SDK_VERSION,
     SafetyCore,
+    SDKDocumentLimits,
+    SDKError,
     build_safety_core,
     verify_policy,
 )
