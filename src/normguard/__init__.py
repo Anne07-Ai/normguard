@@ -46,6 +46,8 @@ from .safety import (
 )
 
 __all__ = [
+    "SDK_SCHEMA_VERSION",
+    "SDK_VERSION",
     "AdapterMetadata",
     "AuditFinding",
     "BM25EvaluationHarness",
@@ -83,8 +85,6 @@ __all__ = [
     "RuntimeResult",
     "SDKDocumentLimits",
     "SDKError",
-    "SDK_SCHEMA_VERSION",
-    "SDK_VERSION",
     "SafetyAuditResult",
     "SafetyCase",
     "SafetyCore",
