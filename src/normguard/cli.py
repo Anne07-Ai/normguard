@@ -7,10 +7,11 @@ import json
 import os
 import stat
 import sys
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from enum import IntEnum
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from .policy_verification import VerificationCode
 from .runtime import RuntimeCode, RuntimeLimits
