@@ -24,8 +24,8 @@ ACTIVATION_STATE_SCHEMA_VERSION = 1
 ROLLBACK_AUTHORIZATION_SCHEMA_VERSION = 1
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 _SEMVER = re.compile(
-    r"^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)"
-    r"(?:-([0-9A-Za-z.-]+))?(?:\\+[0-9A-Za-z.-]+)?$"
+    r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+    r"(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?$"
 )
 _ID = re.compile(r"^[a-z0-9](?:[a-z0-9._-]{0,126}[a-z0-9])?$")
 
