@@ -226,7 +226,7 @@ class NormaliseCLITests(CLIFixture):
             )
         self.assertEqual(code, cli.ExitCode.INVALID_INPUT)
         self.assertEqual(json.loads(stderr)["error"]["code"], "DOCUMENT_TOO_LARGE")
-        build.assert_called_once()
+        build.assert_not_called()
 
     def test_raw_text_command_line_option_does_not_exist(self) -> None:
         completed = subprocess.run(
