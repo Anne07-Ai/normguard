@@ -249,18 +249,22 @@ testing in addition to library tests.
 
 ## Exit criteria for the vertical slice
 
-- [ ] Every NG-T01 through NG-T21 and NG-T23/24 has an implemented control,
+- [x] Every NG-T01 through NG-T21 and NG-T23/24 has an implemented control,
   accepted residual risk or tracked blocker.
-- [ ] NG-T22 remains an explicit blocker for any multi-tenant service.
-- [ ] Tampered, unsigned, unauthorized, incompatible and rolled-back policies fail
+- [x] NG-T22 remains an explicit blocker for any multi-tenant service.
+- [x] Tampered, unsigned, unauthorized, incompatible and rolled-back policies fail
   before text processing.
-- [ ] P0 retention is 100% and unauthorized transformations are zero on the
+- [x] P0 retention is 100% and unauthorized transformations are zero on the
   approved safety suite.
-- [ ] Default logs and evidence contain no raw test text.
-- [ ] Repeated runs are semantically deterministic.
-- [ ] Resource limits and benchmark environment are frozen and tested.
-- [ ] Key compromise and sensitive-log incidents have documented response steps.
+- [x] Default logs and evidence contain no raw test text.
+- [x] Repeated runs are semantically deterministic.
+- [x] Resource limits and benchmark environment are frozen and tested.
+- [x] Key compromise and sensitive-log incidents have documented response steps.
 - [ ] Independent security review is recorded before a production claim.
+
+The Phase 3 reconciliation and remaining blockers are recorded in the
+[release-readiness review](releases/safety-core-phase-3-readiness.md). Completion
+of engineering exit criteria authorizes only its stated controlled-pilot scope.
 
 ## Review triggers
 

@@ -54,11 +54,12 @@ artifacts and must not be committed.
 
 ## Current dependency boundary
 
-The `0.1.0` distribution still includes the research dependencies and the
-hash-pinned spaCy model reference used by the existing repository. This gate
-validates that declared package as-is. Separating a lightweight Safety Core extra
-from the research toolkit changes the public installation contract and requires a
-separate compatibility issue and release decision.
+The `0.1.0` default installation is the lightweight Safety Core and has one
+third-party runtime dependency: `cryptography`. Research dependencies and the
+hash-pinned spaCy model are available only through the `research` extra; PyArrow is
+available only through the `esci` extra. CI builds one artifact and installs each
+profile independently, including a clean core-only environment that rejects
+undeclared research/dataset dependencies.
 
 The completed ESCI calibration boundary remains unchanged. Development and official
 test partitions are not accessed by this workflow.
