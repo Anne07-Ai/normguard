@@ -11,7 +11,7 @@ For every pull request and every push to `main`, CI:
 
 1. restores the locked Python 3.12 environment;
 2. builds the wheel and source distribution with `uv build --no-sources`;
-3. validates package metadata with strict Twine checks;
+3. validates the project schema, wheel contents and installed core metadata;
 4. installs the wheel into a new isolated virtual environment;
 5. smoke-tests the installed package and both CLI entry paths;
 6. audits the installed dependency graph and writes CycloneDX JSON;
@@ -40,7 +40,8 @@ A future publication workflow must be a separate change with:
 ```bash
 uv sync --locked --all-extras --dev
 uv build --no-sources
-uvx --from twine==6.2.0 twine check --strict dist/*
+uvx --from validate-pyproject==0.24.1 validate-pyproject pyproject.toml
+uvx --from check-wheel-contents==0.6.3 check-wheel-contents dist/*.whl
 
 uv venv --seed .release-venv
 uv pip install --python .release-venv/bin/python dist/*.whl
