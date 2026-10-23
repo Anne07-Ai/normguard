@@ -1,0 +1,215 @@
+{
+  "approved_scope": [
+    "controlled offline or single-tenant library pilot",
+    "signed policy verification before bounded deterministic normalisation",
+    "synthetic and organization-approved safety validation"
+  ],
+  "blockers": [
+    {
+      "id": "B-001",
+      "owner": "security-review-owner",
+      "required_for": "external production-readiness claim",
+      "status": "OPEN",
+      "summary": "Independent security review has not yet been recorded"
+    },
+    {
+      "id": "B-002",
+      "owner": "adopting-service-owner",
+      "required_for": "hosted or multi-tenant service",
+      "status": "BLOCKED",
+      "summary": "NG-T22 authentication, tenant authorization, isolation and rate limiting are outside the core"
+    },
+    {
+      "id": "B-003",
+      "owner": "adopting-platform-owner",
+      "required_for": "production SLA or capacity claim",
+      "status": "OPEN",
+      "summary": "Representative sustained load, host memory and concurrency sizing are deployment-specific"
+    }
+  ],
+  "component": "normguard-safety-core",
+  "decision": "READY_FOR_CONTROLLED_PILOT",
+  "gates": [
+    {
+      "evidence": [
+        "docs/install-profiles.md",
+        ".github/workflows/contracts.yml"
+      ],
+      "id": "G-01",
+      "name": "minimal core install profile",
+      "owner": "package-maintainer",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "src/normguard/safety_contracts.py",
+        "src/normguard/policy_verification.py",
+        "tests/test_policy_verification.py"
+      ],
+      "id": "G-02",
+      "name": "signed policy integrity and rollback protection",
+      "owner": "security-maintainer",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "src/normguard/runtime.py",
+        "tests/test_runtime.py"
+      ],
+      "id": "G-03",
+      "name": "bounded deterministic runtime",
+      "owner": "core-maintainer",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "src/normguard/sdk.py",
+        "src/normguard/cli.py",
+        "tests/test_sdk.py",
+        "tests/test_cli.py"
+      ],
+      "id": "G-04",
+      "name": "stable SDK and CLI failure contracts",
+      "owner": "core-maintainer",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "docs/adversarial-testing.md",
+        "tests/test_adversarial_properties.py"
+      ],
+      "id": "G-05",
+      "name": "adversarial and property testing",
+      "owner": "security-maintainer",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "docs/safety-core-performance.md",
+        "src/normguard/performance.py",
+        ".github/workflows/performance.yml"
+      ],
+      "id": "G-06",
+      "name": "synthetic performance regression budget",
+      "owner": "performance-owner",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "docs/observability.md",
+        "src/normguard/observability.py",
+        "tests/test_observability.py"
+      ],
+      "id": "G-07",
+      "name": "privacy-safe bounded observability",
+      "owner": "core-maintainer",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "docs/policy-operations-runbook.md",
+        "docs/checklists/policy-release-rollback.md"
+      ],
+      "id": "G-08",
+      "name": "policy operations and incident response",
+      "owner": "service-owner",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "examples/integrations/service.py",
+        "tests/test_integration_example.py"
+      ],
+      "id": "G-09",
+      "name": "atomic production integration pattern",
+      "owner": "integration-owner",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "docs/release-artifact-gate.md",
+        ".github/workflows/release-artifacts.yml"
+      ],
+      "id": "G-10",
+      "name": "non-publishing package artifact gate",
+      "owner": "release-owner",
+      "status": "PASS"
+    }
+  ],
+  "non_claims": [
+    "not approved as a hosted or multi-tenant service",
+    "not an external production-readiness certification",
+    "not evidence that general lemmatisation improves retrieval",
+    "not proof of correctness for every language, policy or Unicode sequence",
+    "not a production SLA, capacity or universal security guarantee"
+  ],
+  "prohibited_scope": [
+    "hosted multi-tenant service without NG-T22 controls",
+    "production retrieval use of the rejected general-lemmatisation approach",
+    "unsigned policy activation or verification bypass",
+    "access to sealed ESCI development or official-test partitions",
+    "public release or package publication without a separate approved workflow"
+  ],
+  "residual_risks": [
+    {
+      "id": "R-001",
+      "mitigation": "independent review plus signed two-reviewer policy governance",
+      "owner": "security-review-owner",
+      "summary": "A correctly signed but semantically unsafe policy remains possible"
+    },
+    {
+      "id": "R-002",
+      "mitigation": "hardened host, read-only mounts, managed KMS/HSM and platform monitoring",
+      "owner": "adopting-platform-owner",
+      "summary": "Host compromise is outside process-level library controls"
+    },
+    {
+      "id": "R-003",
+      "mitigation": "representative load tests and deployment-specific budgets",
+      "owner": "adopting-platform-owner",
+      "summary": "Synthetic CI budgets do not establish production capacity"
+    },
+    {
+      "id": "R-004",
+      "mitigation": "downstream contract tests and explicit review/failure routing",
+      "owner": "adopting-service-owner",
+      "summary": "Callers can misuse review-required or failure outcomes"
+    },
+    {
+      "id": "R-005",
+      "mitigation": "SBOM review, locked builds, vulnerability response and artifact verification",
+      "owner": "release-owner",
+      "summary": "Offline operation does not eliminate software supply-chain risk"
+    }
+  ],
+  "review_date": "2026-10-23",
+  "schema_version": 1,
+  "sealed_data_status": "development-and-official-test-not-read-or-transformed",
+  "threat_dispositions": [
+    {"id": "NG-T01", "status": "CONTROLLED"},
+    {"id": "NG-T02", "status": "CONTROLLED"},
+    {"id": "NG-T03", "status": "CONTROLLED"},
+    {"id": "NG-T04", "status": "CONTROLLED"},
+    {"id": "NG-T05", "status": "CONTROLLED"},
+    {"id": "NG-T06", "status": "CONTROLLED"},
+    {"id": "NG-T07", "status": "CONTROLLED"},
+    {"id": "NG-T08", "status": "CONTROLLED"},
+    {"id": "NG-T09", "status": "CONTROLLED"},
+    {"id": "NG-T10", "status": "CONTROLLED"},
+    {"id": "NG-T11", "status": "ACCEPTED_RESIDUAL_RISK"},
+    {"id": "NG-T12", "status": "CONTROLLED"},
+    {"id": "NG-T13", "status": "CONTROLLED"},
+    {"id": "NG-T14", "status": "CONTROLLED"},
+    {"id": "NG-T15", "status": "CONTROLLED"},
+    {"id": "NG-T16", "status": "CONTROLLED"},
+    {"id": "NG-T17", "status": "CONTROLLED"},
+    {"id": "NG-T18", "status": "CONTROLLED"},
+    {"id": "NG-T19", "status": "CONTROLLED"},
+    {"id": "NG-T20", "status": "CONTROLLED"},
+    {"id": "NG-T21", "status": "CONTROLLED"},
+    {"id": "NG-T22", "status": "BLOCKED_FOR_HOSTED_SERVICE"},
+    {"id": "NG-T23", "status": "CONTROLLED"},
+    {"id": "NG-T24", "status": "CONTROLLED"}
+  ],
+  "version_candidate": "0.1.0"
+}
