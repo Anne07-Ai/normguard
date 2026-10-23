@@ -70,6 +70,20 @@ jobs:
           .release-venv/bin/normguard --help
           .release-venv/bin/python -m normguard.cli --help
 
+      - name: Prove core install excludes research and ESCI stacks
+        run: |
+          .release-venv/bin/python - <<'PY'
+          from importlib.util import find_spec
+
+          import normguard
+          from normguard import SDK_VERSION, SafetyCore, verify_policy
+
+          assert SDK_VERSION == normguard.__version__
+          assert SafetyCore is not None and verify_policy is not None
+          for package in ("bm25s", "spacy", "en_core_web_sm", "ir_measures", "numpy", "pyarrow"):
+              assert find_spec(package) is None, f"unexpected core dependency: {package}"
+          PY
+
       - name: Audit installed dependencies and generate CycloneDX report
         run: |
           mkdir -p artifacts/release
