@@ -74,7 +74,7 @@ jobs:
         run: |
           mkdir -p artifacts/release
           uvx --from pip-audit==2.9.0 pip-audit \
-            --python .release-venv/bin/python \
+            --path .release-venv/lib/python3.12/site-packages \
             --format cyclonedx-json \
             --output artifacts/release/dependency-audit.cdx.json
 
