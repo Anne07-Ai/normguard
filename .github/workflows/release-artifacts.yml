@@ -43,7 +43,6 @@ jobs:
           python - <<'PY'
           from email.parser import BytesParser
           from glob import glob
-          from packaging.specifiers import SpecifierSet
           from zipfile import ZipFile
 
           wheel, = glob("dist/*.whl")
@@ -56,7 +55,7 @@ jobs:
 
           assert metadata["Name"] == "normguard"
           assert metadata["Version"] == "0.1.0"
-          assert SpecifierSet(metadata["Requires-Python"]) == SpecifierSet(">=3.12,<3.13")
+          assert {item.strip() for item in metadata["Requires-Python"].split(",")} == {">=3.12", "<3.13"}
           assert metadata.get_all("Requires-Dist")
           PY
 
