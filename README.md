@@ -11,6 +11,7 @@
 [Final decision](docs/adr/0002-stop-general-lemmatisation.md) ·
 [Architecture](docs/architecture.md) ·
 [Policy operations](docs/policy-operations-runbook.md) ·
+[Integration example](examples/integrations/README.md) ·
 [Evaluation protocol](research/evaluation-plan.md) ·
 [ESCI protocol](docs/esci-dataset.md) ·
 [Contributing](CONTRIBUTING.md)
