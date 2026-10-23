@@ -1,0 +1,98 @@
+name: Release artifact checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  release-artifacts:
+    name: Build and verify Python artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.18"
+          enable-cache: true
+
+      - name: Verify locked environment
+        run: uv sync --locked --all-extras --dev
+
+      - name: Build wheel and source distribution
+        run: uv build --no-sources
+
+      - name: Validate package metadata and wheel contents
+        run: |
+          uvx --from validate-pyproject==0.24.1 --with 'packaging>=24.2' validate-pyproject pyproject.toml
+          uvx --from check-wheel-contents==0.6.3 check-wheel-contents dist/*.whl
+          python - <<'PY'
+          from email.parser import BytesParser
+          from glob import glob
+          from zipfile import ZipFile
+
+          wheel, = glob("dist/*.whl")
+          with ZipFile(wheel) as archive:
+              metadata_name, = [
+                  name for name in archive.namelist()
+                  if name.endswith(".dist-info/METADATA")
+              ]
+              metadata = BytesParser().parsebytes(archive.read(metadata_name))
+
+          assert metadata["Name"] == "normguard"
+          assert metadata["Version"] == "0.1.0"
+          assert {item.strip() for item in metadata["Requires-Python"].split(",")} == {">=3.12", "<3.13"}
+          assert metadata.get_all("Requires-Dist")
+          PY
+
+      - name: Install wheel in clean environment
+        run: |
+          uv venv --seed .release-venv
+          uv pip install --python .release-venv/bin/python dist/*.whl
+
+      - name: Smoke-test installed SDK and CLI
+        run: |
+          .release-venv/bin/python -c "import normguard; print(normguard.__version__)"
+          .release-venv/bin/normguard --help
+          .release-venv/bin/python -m normguard.cli --help
+
+      - name: Audit installed dependencies and generate CycloneDX report
+        run: |
+          mkdir -p artifacts/release
+          uvx --from pip-audit==2.9.0 pip-audit \
+            --path .release-venv/lib/python3.12/site-packages \
+            --format cyclonedx-json \
+            --output artifacts/release/dependency-audit.cdx.json
+
+      - name: Generate artifact checksums
+        run: |
+          sha256sum dist/* > artifacts/release/SHA256SUMS
+          python -m zipfile --list dist/*.whl > artifacts/release/wheel-contents.txt
+
+      - name: Upload validated distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: normguard-python-distributions
+          path: dist/
+          if-no-files-found: error
+
+      - name: Upload release evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: normguard-release-evidence
+          path: artifacts/release/
+          if-no-files-found: error
