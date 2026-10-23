@@ -1,0 +1,44 @@
+name: Safety Core performance gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  performance:
+    name: Synthetic core performance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.18"
+          enable-cache: true
+
+      - name: Install core-only locked environment
+        run: uv sync --locked --no-dev
+
+      - name: Run frozen performance contract
+        run: uv run --locked --no-dev python -m normguard.performance
+
+      - name: Upload performance evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: normguard-safety-core-performance
+          path: artifacts/performance/safety-core-performance.json
+          if-no-files-found: error
