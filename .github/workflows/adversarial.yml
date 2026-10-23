@@ -38,4 +38,4 @@ jobs:
       - name: Run adversarial property suite
         run: |
           uv run --locked --no-extra research --no-extra esci --dev \
-            python -m unittest tests.test_adversarial_properties -v
+            python -m unittest tests.test_adversarial_properties tests.test_observability -v

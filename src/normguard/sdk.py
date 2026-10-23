@@ -7,6 +7,14 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
+from .observability import (
+    TelemetryEvent,
+    TelemetryOperation,
+    TelemetryReason,
+    TelemetrySink,
+    TelemetryStatus,
+    emit_safely,
+)
 from .policy_verification import (
     ActivationState,
     PolicyVerificationError,
@@ -193,18 +201,20 @@ def verify_policy(
 class SafetyCore:
     """Stable SDK object for bounded use of one verified policy."""
 
-    __slots__ = ("_runtime",)
+    __slots__ = ("_runtime", "_telemetry")
 
     def __init__(
         self,
         verified_policy: VerifiedPolicy,
         *,
         runtime_limits: RuntimeLimits | None = None,
+        telemetry: TelemetrySink | None = None,
     ) -> None:
         self._runtime = BoundedSafetyRuntime(
             verified_policy,
             limits=runtime_limits,
         )
+        self._telemetry = telemetry
 
     @property
     def verified_policy(self) -> VerifiedPolicy:
@@ -216,13 +226,37 @@ class SafetyCore:
 
     def normalise(self, text: str) -> RuntimeResult:
         try:
-            return self._runtime.normalise(text)
+            result = self._runtime.normalise(text)
         except RuntimeFailure as exc:
+            reason = {
+                "INVALID_INPUT": TelemetryReason.INVALID_INPUT,
+                "LIMIT_EXCEEDED": TelemetryReason.LIMIT_EXCEEDED,
+                "INTERNAL_FAILURE": TelemetryReason.INTERNAL_FAILURE,
+            }[exc.code.value]
+            emit_safely(
+                self._telemetry,
+                TelemetryEvent(
+                    TelemetryOperation.NORMALISATION,
+                    TelemetryStatus.FAILED,
+                    reason,
+                ),
+            )
             raise SDKError(
                 exc.code.value,
                 policy_id=exc.policy_id,
                 limit=None if exc.limit is None else exc.limit.value,
             ) from None
+        emit_safely(
+            self._telemetry,
+            TelemetryEvent(
+                TelemetryOperation.NORMALISATION,
+                TelemetryStatus(result.status.value),
+                input_bytes=result.evidence.input_bytes,
+                match_count=sum(span.rule_id != "unprotected" for span in result.evidence.spans),
+                safety_event_count=len(result.evidence.safety_events),
+            ),
+        )
+        return result
 
 
 def build_safety_core(
@@ -235,16 +269,40 @@ def build_safety_core(
     runtime_limits: RuntimeLimits | None = None,
     rollback_authorization_bytes: bytes | None = None,
     rollback_trust_store_bytes: bytes | None = None,
+    telemetry: TelemetrySink | None = None,
 ) -> SafetyCore:
     """Verify untrusted documents and construct the bounded SDK runtime."""
 
-    verified = verify_policy(
-        policy_bundle_bytes,
-        trust_store_bytes,
-        activation_state_bytes,
-        verification_time=verification_time,
-        document_limits=document_limits,
-        rollback_authorization_bytes=rollback_authorization_bytes,
-        rollback_trust_store_bytes=rollback_trust_store_bytes,
+    try:
+        verified = verify_policy(
+            policy_bundle_bytes,
+            trust_store_bytes,
+            activation_state_bytes,
+            verification_time=verification_time,
+            document_limits=document_limits,
+            rollback_authorization_bytes=rollback_authorization_bytes,
+            rollback_trust_store_bytes=rollback_trust_store_bytes,
+        )
+    except SDKError as exc:
+        reason = (
+            TelemetryReason.INVALID_DOCUMENT
+            if exc.code in {"INVALID_DOCUMENT", "DOCUMENT_TOO_LARGE"}
+            else TelemetryReason.VERIFICATION_FAILED
+        )
+        emit_safely(
+            telemetry,
+            TelemetryEvent(
+                TelemetryOperation.POLICY_VERIFICATION,
+                TelemetryStatus.FAILED,
+                reason,
+            ),
+        )
+        raise
+    emit_safely(
+        telemetry,
+        TelemetryEvent(
+            TelemetryOperation.POLICY_VERIFICATION,
+            TelemetryStatus.SUCCESS,
+        ),
     )
-    return SafetyCore(verified, runtime_limits=runtime_limits)
+    return SafetyCore(verified, runtime_limits=runtime_limits, telemetry=telemetry)

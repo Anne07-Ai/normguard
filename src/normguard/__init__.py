@@ -20,6 +20,17 @@ from .contracts import (
     SpanTrace,
 )
 from .normalisation import NormalisationResult, ProtectedNormaliser
+from .observability import (
+    OBSERVABILITY_SCHEMA_VERSION,
+    JsonLinesTelemetrySink,
+    MetricName,
+    TelemetryEvent,
+    TelemetryMetric,
+    TelemetryOperation,
+    TelemetryReason,
+    TelemetrySink,
+    TelemetryStatus,
+)
 from .runtime import (
     BoundedSafetyRuntime,
     RuntimeCode,
@@ -82,6 +93,7 @@ def __getattr__(name: str) -> Any:
     return value
 
 __all__ = [
+    "OBSERVABILITY_SCHEMA_VERSION",
     "SDK_SCHEMA_VERSION",
     "SDK_VERSION",
     "AdapterMetadata",
@@ -98,7 +110,9 @@ __all__ = [
     "ExperimentReport",
     "Failure",
     "FailureCode",
+    "JsonLinesTelemetrySink",
     "LoadedPolicy",
+    "MetricName",
     "NormalisationAdapter",
     "NormalisationResult",
     "ObservedSpan",
@@ -127,6 +141,12 @@ __all__ = [
     "Severity",
     "SpanAction",
     "SpanTrace",
+    "TelemetryEvent",
+    "TelemetryMetric",
+    "TelemetryOperation",
+    "TelemetryReason",
+    "TelemetrySink",
+    "TelemetryStatus",
     "TerminologySafetyAuditor",
     "build_safety_core",
     "compare_paired",
