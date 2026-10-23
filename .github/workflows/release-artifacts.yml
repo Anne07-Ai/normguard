@@ -38,11 +38,12 @@ jobs:
 
       - name: Validate package metadata and wheel contents
         run: |
-          uvx --from validate-pyproject==0.24.1 validate-pyproject pyproject.toml
+          uvx --from validate-pyproject==0.24.1 --with 'packaging>=24.2' validate-pyproject pyproject.toml
           uvx --from check-wheel-contents==0.6.3 check-wheel-contents dist/*.whl
           python - <<'PY'
           from email.parser import BytesParser
           from glob import glob
+          from packaging.specifiers import SpecifierSet
           from zipfile import ZipFile
 
           wheel, = glob("dist/*.whl")
@@ -55,7 +56,7 @@ jobs:
 
           assert metadata["Name"] == "normguard"
           assert metadata["Version"] == "0.1.0"
-          assert metadata["Requires-Python"] == ">=3.12,<3.13"
+          assert SpecifierSet(metadata["Requires-Python"]) == SpecifierSet(">=3.12,<3.13")
           assert metadata.get_all("Requires-Dist")
           PY
 
