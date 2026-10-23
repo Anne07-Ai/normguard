@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = "==3.12.*"
 
 [[package]]
@@ -395,17 +395,19 @@ name = "normguard"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "bm25s" },
     { name = "cryptography" },
-    { name = "en-core-web-sm" },
-    { name = "ir-measures" },
-    { name = "numpy" },
-    { name = "spacy" },
 ]
 
 [package.optional-dependencies]
 esci = [
     { name = "pyarrow" },
+]
+research = [
+    { name = "bm25s" },
+    { name = "en-core-web-sm" },
+    { name = "ir-measures" },
+    { name = "numpy" },
+    { name = "spacy" },
 ]
 
 [package.dev-dependencies]
@@ -416,15 +418,15 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bm25s", specifier = "==0.3.11" },
+    { name = "bm25s", marker = "extra == 'research'", specifier = "==0.3.11" },
     { name = "cryptography", specifier = ">=46,<51" },
-    { name = "en-core-web-sm", url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" },
-    { name = "ir-measures", specifier = "==0.4.3" },
-    { name = "numpy", specifier = ">=2.0,<3" },
+    { name = "en-core-web-sm", marker = "extra == 'research'", url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" },
+    { name = "ir-measures", marker = "extra == 'research'", specifier = "==0.4.3" },
+    { name = "numpy", marker = "extra == 'research'", specifier = ">=2.0,<3" },
     { name = "pyarrow", marker = "extra == 'esci'", specifier = ">=18,<22" },
-    { name = "spacy", specifier = "==3.8.16" },
+    { name = "spacy", marker = "extra == 'research'", specifier = "==3.8.16" },
 ]
-provides-extras = ["esci"]
+provides-extras = ["esci", "research"]
 
 [package.metadata.requires-dev]
 dev = [
