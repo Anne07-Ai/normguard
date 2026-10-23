@@ -5,13 +5,29 @@ build-backend = "hatchling.build"
 [project]
 name = "normguard"
 version = "0.1.0"
-description = "Evidence-led assurance for text-normalisation changes in retrieval systems"
+description = "Policy-first safety controls and evidence for text normalisation"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 license = { text = "Apache-2.0" }
 authors = [
   { name = "NormGuard contributors" }
 ]
+keywords = ["ai-safety", "normalisation", "nlp", "rag", "search"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/Anne07-Ai/normguard"
+Issues = "https://github.com/Anne07-Ai/normguard/issues"
+Repository = "https://github.com/Anne07-Ai/normguard"
 dependencies = [
   "bm25s==0.3.11",
   "cryptography>=46,<51",
