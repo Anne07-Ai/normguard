@@ -24,10 +24,6 @@ classifiers = [
   "Typing :: Typed",
 ]
 
-[project.urls]
-Homepage = "https://github.com/Anne07-Ai/normguard"
-Issues = "https://github.com/Anne07-Ai/normguard/issues"
-Repository = "https://github.com/Anne07-Ai/normguard"
 dependencies = [
   "bm25s==0.3.11",
   "cryptography>=46,<51",
@@ -42,6 +38,11 @@ normguard = "normguard.cli:main"
 
 [project.optional-dependencies]
 esci = ["pyarrow>=18,<22"]
+
+[project.urls]
+Homepage = "https://github.com/Anne07-Ai/normguard"
+Issues = "https://github.com/Anne07-Ai/normguard/issues"
+Repository = "https://github.com/Anne07-Ai/normguard"
 
 [dependency-groups]
 dev = [
