@@ -10,6 +10,68 @@ permissions:
   contents: read
 
 jobs:
+  install-profiles:
+    name: Install profile - ${{ matrix.profile }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [core, research, esci]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.18"
+
+      - name: Build wheel
+        run: uv build --wheel --no-sources
+
+      - name: Install selected profile
+        run: |
+          uv venv --seed .profile-venv
+          wheel=$(find dist -name '*.whl' -print -quit)
+          if [ "${{ matrix.profile }}" = core ]; then
+            uv pip install --python .profile-venv/bin/python "$wheel"
+          else
+            uv pip install --python .profile-venv/bin/python "$wheel[${{ matrix.profile }}]"
+          fi
+
+      - name: Verify selected profile
+        run: |
+          PROFILE="${{ matrix.profile }}" .profile-venv/bin/python - <<'PY'
+          import os
+          from importlib.util import find_spec
+
+          import normguard
+          from normguard import SDK_VERSION, SafetyCore, verify_policy
+
+          profile = os.environ["PROFILE"]
+          assert SDK_VERSION == normguard.__version__
+          assert SafetyCore is not None and verify_policy is not None
+          if profile == "core":
+              assert find_spec("spacy") is None
+              assert find_spec("pyarrow") is None
+          elif profile == "research":
+              from normguard import C4SpacyAdapter, paired_statistics
+              assert C4SpacyAdapter is not None and paired_statistics is not None
+              assert find_spec("en_core_web_sm") is not None
+              assert find_spec("pyarrow") is None
+          else:
+              import normguard.esci
+              assert find_spec("pyarrow") is not None
+              assert find_spec("spacy") is None
+          PY
+
   contracts:
     name: Python 3.12 contracts
     runs-on: ubuntu-latest

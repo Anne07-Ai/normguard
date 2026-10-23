@@ -1,6 +1,12 @@
-"""NormGuard: assurance contracts for text-normalisation experiments."""
+"""Lightweight public facade for the NormGuard Safety Core.
 
-from .adapters import AdapterMetadata, C0Adapter, C4SpacyAdapter, NormalisationAdapter
+Research symbols remain available lazily for compatibility when the ``research``
+extra is installed. Importing :mod:`normguard` itself never imports that stack.
+"""
+
+from importlib import import_module
+from typing import Any
+
 from .contracts import (
     Decision,
     EvidenceBundle,
@@ -13,22 +19,7 @@ from .contracts import (
     SpanAction,
     SpanTrace,
 )
-from .esci_experiment import EsciPartition, load_partition
-from .experiment import PairedStatistics, paired_statistics, select_bm25_parameters
 from .normalisation import NormalisationResult, ProtectedNormaliser
-from .policy_io import LoadedPolicy, load_policy, require_development_approval
-from .reporting import DecisionEvidence, EvidenceReporter, ExperimentReport
-from .retrieval import (
-    BM25EvaluationHarness,
-    PairedComparison,
-    QueryEvaluation,
-    RankedHit,
-    RelevanceJudgement,
-    RetrievalDocument,
-    RetrievalEvaluation,
-    RetrievalQuery,
-    compare_paired,
-)
 from .runtime import (
     BoundedSafetyRuntime,
     RuntimeCode,
@@ -37,13 +28,58 @@ from .runtime import (
     RuntimeLimits,
     RuntimeResult,
 )
-from .safety import (
-    AuditFinding,
-    ObservedSpan,
-    SafetyAuditResult,
-    SafetyCase,
-    TerminologySafetyAuditor,
+from .sdk import (
+    SDK_SCHEMA_VERSION,
+    SDK_VERSION,
+    SafetyCore,
+    SDKDocumentLimits,
+    SDKError,
+    build_safety_core,
+    verify_policy,
 )
+
+_LAZY_EXPORTS = {
+    "AdapterMetadata": (".adapters", "AdapterMetadata"),
+    "AuditFinding": (".safety", "AuditFinding"),
+    "BM25EvaluationHarness": (".retrieval", "BM25EvaluationHarness"),
+    "C0Adapter": (".adapters", "C0Adapter"),
+    "C4SpacyAdapter": (".adapters", "C4SpacyAdapter"),
+    "DecisionEvidence": (".reporting", "DecisionEvidence"),
+    "EsciPartition": (".esci_experiment", "EsciPartition"),
+    "EvidenceReporter": (".reporting", "EvidenceReporter"),
+    "ExperimentReport": (".reporting", "ExperimentReport"),
+    "LoadedPolicy": (".policy_io", "LoadedPolicy"),
+    "NormalisationAdapter": (".adapters", "NormalisationAdapter"),
+    "ObservedSpan": (".safety", "ObservedSpan"),
+    "PairedComparison": (".retrieval", "PairedComparison"),
+    "PairedStatistics": (".experiment", "PairedStatistics"),
+    "QueryEvaluation": (".retrieval", "QueryEvaluation"),
+    "RankedHit": (".retrieval", "RankedHit"),
+    "RelevanceJudgement": (".retrieval", "RelevanceJudgement"),
+    "RetrievalDocument": (".retrieval", "RetrievalDocument"),
+    "RetrievalEvaluation": (".retrieval", "RetrievalEvaluation"),
+    "RetrievalQuery": (".retrieval", "RetrievalQuery"),
+    "SafetyAuditResult": (".safety", "SafetyAuditResult"),
+    "SafetyCase": (".safety", "SafetyCase"),
+    "TerminologySafetyAuditor": (".safety", "TerminologySafetyAuditor"),
+    "compare_paired": (".retrieval", "compare_paired"),
+    "load_partition": (".esci_experiment", "load_partition"),
+    "load_policy": (".policy_io", "load_policy"),
+    "paired_statistics": (".experiment", "paired_statistics"),
+    "require_development_approval": (".policy_io", "require_development_approval"),
+    "select_bm25_parameters": (".experiment", "select_bm25_parameters"),
+}
+
+
+def __getattr__(name: str) -> Any:
+    """Load legacy research exports only when consumers explicitly request them."""
+    target = _LAZY_EXPORTS.get(name)
+    if target is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    module_name, attribute = target
+    value = getattr(import_module(module_name, __name__), attribute)
+    globals()[name] = value
+    return value
 
 __all__ = [
     "SDK_SCHEMA_VERSION",
