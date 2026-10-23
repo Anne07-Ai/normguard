@@ -1,0 +1,41 @@
+name: Safety Core adversarial checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  adversarial:
+    name: Deterministic property and threat tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HYPOTHESIS_STORAGE_DIRECTORY: /tmp/normguard-hypothesis
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.18"
+          enable-cache: true
+
+      - name: Install locked core and development dependencies
+        run: uv sync --locked --no-extra research --no-extra esci --dev
+
+      - name: Run adversarial property suite
+        run: |
+          uv run --locked --no-extra research --no-extra esci --dev \
+            python -m unittest tests.test_adversarial_properties -v
