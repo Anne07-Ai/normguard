@@ -25,12 +25,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "bm25s==0.3.11",
   "cryptography>=46,<51",
-  "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl#sha256=1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85",
-  "ir-measures==0.4.3",
-  "numpy>=2.0,<3",
-  "spacy==3.8.16",
 ]
 
 [project.scripts]
@@ -38,6 +33,13 @@ normguard = "normguard.cli:main"
 
 [project.optional-dependencies]
 esci = ["pyarrow>=18,<22"]
+research = [
+  "bm25s==0.3.11",
+  "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl#sha256=1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85",
+  "ir-measures==0.4.3",
+  "numpy>=2.0,<3",
+  "spacy==3.8.16",
+]
 
 [project.urls]
 Homepage = "https://github.com/Anne07-Ai/normguard"
