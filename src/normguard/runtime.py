@@ -160,7 +160,10 @@ class BoundedSafetyRuntime:
         if not isinstance(text, str):
             raise RuntimeFailure(RuntimeCode.INVALID_INPUT, policy_id=policy_id)
 
-        input_bytes = text.encode("utf-8")
+        try:
+            input_bytes = text.encode("utf-8")
+        except UnicodeEncodeError:
+            raise RuntimeFailure(RuntimeCode.INVALID_INPUT, policy_id=policy_id) from None
         self._check_limit(
             len(input_bytes),
             self._limits.max_input_bytes,
