@@ -62,7 +62,7 @@ jobs:
       - name: Install wheel in clean environment
         run: |
           uv venv --seed .release-venv
-          uv pip install --path .release-venv/lib/python3.12/site-packages dist/*.whl
+          uv pip install --python .release-venv/bin/python dist/*.whl
 
       - name: Smoke-test installed SDK and CLI
         run: |
