@@ -43,8 +43,12 @@ Delete the local file after setup. Generate into a new empty directory when rota
 5. Confirm `/health` reports ready before running synthetic tests.
 
 The API surface is intentionally limited to unauthenticated `/health` and authenticated
-`POST /v1/normalise`. OpenAPI and interactive documentation are disabled. Access logs
-are disabled so request paths and transport metadata are not retained by the process.
+`POST /v1/normalise`. On a private Space, Hugging Face owns the standard `Authorization`
+header for platform authentication; callers must send the NormGuard application secret in
+`X-NormGuard-Token`. The service deliberately rejects an `Authorization` bearer value as
+a substitute for the application token. OpenAPI and interactive documentation are disabled.
+Access logs are disabled so request paths and transport metadata are not retained by the
+process.
 
 Hugging Face platform logs and proxy behavior remain platform-controlled. Use synthetic
 inputs only and never treat a private Space as an enterprise identity, tenant-isolation
