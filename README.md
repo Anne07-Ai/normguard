@@ -13,6 +13,7 @@
 [Policy operations](docs/policy-operations-runbook.md) ·
 [Integration example](examples/integrations/README.md) ·
 [Release readiness](docs/releases/safety-core-phase-3-readiness.md) ·
+[Controlled pilot](docs/pilots/controlled-pilot-plan.md) ·
 [Evaluation protocol](research/evaluation-plan.md) ·
 [ESCI protocol](docs/esci-dataset.md) ·
 [Contributing](CONTRIBUTING.md)
