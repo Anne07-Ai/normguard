@@ -25,6 +25,7 @@ from normguard.safety_contracts import EvidenceStatus
 from normguard.sdk import SDK_VERSION, SDKError, build_safety_core
 
 SERVICE_SCHEMA_VERSION = 1
+SERVICE_TOKEN_HEADER = "x-normguard-token"
 
 
 class ApplicationStatus(StrEnum):
@@ -216,12 +217,9 @@ def create_app(
 
     @app.post("/v1/normalise")
     async def normalise(request: Request):
-        authorization = request.headers.get("authorization")
-        if not authorization or not authorization.startswith("Bearer "):
-            return _error(401, "UNAUTHENTICATED", headers={"WWW-Authenticate": "Bearer"})
-        supplied = authorization.removeprefix("Bearer ")
+        supplied = request.headers.get(SERVICE_TOKEN_HEADER)
         if not supplied or not secrets.compare_digest(supplied, settings.bearer_token):
-            return _error(401, "UNAUTHENTICATED", headers={"WWW-Authenticate": "Bearer"})
+            return _error(401, "UNAUTHENTICATED")
 
         permitted, retry_after = rate_limiter.acquire()
         if not permitted:
