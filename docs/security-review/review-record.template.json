@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "review_status": "NOT_STARTED",
+  "scope": {
+    "component": "normguard-safety-core",
+    "source_commit": null,
+    "artifact_sha256": null,
+    "review_boundary": "offline-or-single-tenant-library-core"
+  },
+  "reviewers": [],
+  "threat_coverage": [
+    {"threat_id": "NG-T01", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T02", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T03", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T04", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T05", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T06", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T07", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T08", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T09", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T10", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T11", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T12", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T13", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T14", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T15", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T16", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T17", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T18", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T19", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T20", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T21", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T22", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T23", "outcome": "NOT_VERIFIED", "evidence_refs": []},
+    {"threat_id": "NG-T24", "outcome": "NOT_VERIFIED", "evidence_refs": []}
+  ],
+  "findings": [],
+  "conclusion": null,
+  "sign_off": null
+}
