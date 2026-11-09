@@ -22,6 +22,17 @@ for public, multi-tenant or customer-data use.
 Never upload a private signing key. The process fails startup when any document is
 missing, malformed, unsigned, expired, rolled back or otherwise untrusted.
 
+Generate all four values locally from the repository root:
+
+```bash
+uv run --locked python -m normguard.pilot_provisioning ./pilot-secrets
+```
+
+The command writes `pilot-secrets/huggingface-secrets.env` with owner-only permissions.
+Copy each value into the private Space's **Settings → Variables and secrets → Secrets**.
+Never paste values into issues, pull requests, chat, CI variables, shell history, or logs.
+Delete the local file after setup. Generate into a new empty directory when rotating.
+
 ## Space settings
 
 1. Create the Space as **Private**, SDK **Docker**, hardware **CPU Basic**.
