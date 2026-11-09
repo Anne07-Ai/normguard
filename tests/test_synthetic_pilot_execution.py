@@ -105,6 +105,13 @@ class SyntheticPilotExecutionTests(unittest.TestCase):
         self.assertNotIn("pypi", workflow.casefold())
         self.assertNotIn("esci", workflow.casefold())
 
+    def test_performance_gate_uses_clean_exact_wheel_boundary(self) -> None:
+        workflow = (ROOT / ".github/workflows/performance.yml").read_text()
+        self.assertIn("uv build --wheel --no-sources", workflow)
+        self.assertIn("uv pip install --python .performance-venv/bin/python", workflow)
+        self.assertIn(".performance-venv/bin/python -m normguard.performance", workflow)
+        self.assertNotIn("uv sync --locked --no-dev", workflow)
+
     def test_generated_example_is_valid_json_without_raw_case_text(self) -> None:
         example = ROOT / "examples/pilots/controlled-pilot-evidence.example.json"
         json.loads(example.read_text(encoding="utf-8"))
