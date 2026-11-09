@@ -20,7 +20,7 @@ class PilotProvisioningTests(unittest.TestCase):
             response = client.post(
                 "/v1/normalise",
                 headers={
-                    "Authorization": f"Bearer {provisioned.secrets['NORMGUARD_BEARER_TOKEN']}"
+                    "X-NormGuard-Token": provisioned.secrets["NORMGUARD_BEARER_TOKEN"]
                 },
                 json={"text": "NORMGUARD-PILOT"},
             )
