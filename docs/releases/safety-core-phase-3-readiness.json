@@ -6,22 +6,39 @@
   ],
   "blockers": [
     {
+      "closure_evidence": "completed independent review record with verified findings disposition and reviewer sign-off",
       "id": "B-001",
       "owner": "security-review-owner",
+      "preparation_evidence": [
+        "docs/security-review/README.md",
+        "docs/security-review/evidence-index.json",
+        "docs/security-review/review-record.schema.json",
+        "docs/security-review/review-record.template.json"
+      ],
       "required_for": "external production-readiness claim",
       "status": "OPEN",
       "summary": "Independent security review has not yet been recorded"
     },
     {
+      "closure_evidence": "implemented hosted controls plus independent tenant-isolation and adversarial test evidence",
       "id": "B-002",
       "owner": "adopting-service-owner",
+      "preparation_evidence": [
+        "docs/adr/0005-hosted-service-security-boundary.md",
+        "docs/hosted-service-security-boundary.json"
+      ],
       "required_for": "hosted or multi-tenant service",
       "status": "BLOCKED",
       "summary": "NG-T22 authentication, tenant authorization, isolation and rate limiting are outside the core"
     },
     {
+      "closure_evidence": "passing sustained representative run with platform RSS, CPU, throttling and saturation evidence",
       "id": "B-003",
       "owner": "adopting-platform-owner",
+      "preparation_evidence": [
+        "docs/capacity-testing.md",
+        "src/normguard/capacity.py"
+      ],
       "required_for": "production SLA or capacity claim",
       "status": "OPEN",
       "summary": "Representative sustained load, host memory and concurrency sizing are deployment-specific"

@@ -74,6 +74,37 @@ class ReleaseReadinessTests(unittest.TestCase):
                     self.assertTrue(item["owner"])
                     self.assertTrue(item["summary"])
 
+    def test_blocker_preparation_evidence_exists_without_claiming_closure(self) -> None:
+        expected = {
+            "B-001": "docs/security-review/review-record.schema.json",
+            "B-002": "docs/hosted-service-security-boundary.json",
+            "B-003": "src/normguard/capacity.py",
+        }
+        blockers = {item["id"]: item for item in self.record["blockers"]}
+        for blocker_id, required_path in expected.items():
+            with self.subTest(blocker=blocker_id):
+                blocker = blockers[blocker_id]
+                self.assertEqual(
+                    set(blocker),
+                    {
+                        "closure_evidence",
+                        "id",
+                        "owner",
+                        "preparation_evidence",
+                        "required_for",
+                        "status",
+                        "summary",
+                    },
+                )
+                self.assertTrue(blocker["closure_evidence"])
+                self.assertIn(required_path, blocker["preparation_evidence"])
+                for evidence in blocker["preparation_evidence"]:
+                    self.assertTrue((ROOT / evidence).is_file(), evidence)
+
+        self.assertEqual(blockers["B-001"]["status"], "OPEN")
+        self.assertEqual(blockers["B-002"]["status"], "BLOCKED")
+        self.assertEqual(blockers["B-003"]["status"], "OPEN")
+
     def test_pilot_gate_exists_without_closing_production_blockers(self) -> None:
         gates = {gate["id"]: gate for gate in self.record["gates"]}
         self.assertEqual(gates["G-11"]["name"], "synthetic controlled pilot execution")
