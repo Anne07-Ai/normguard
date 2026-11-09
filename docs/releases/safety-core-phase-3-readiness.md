@@ -93,6 +93,13 @@ isolation. Building a web endpoint around it does not satisfy that threat.
 | NG-T22 service controls | Hosted/multi-tenant deployment | Adopting service owner | AuthN/AuthZ, isolation, rate-limit and tenant-leakage tests |
 | Representative capacity test | Production SLA/capacity claim | Adopting platform owner | Sustained workload report on target infrastructure |
 
+Preparation evidence now exists for each blocker: the independent-review package
+defines the reviewer record and evidence index; ADR 0005 and its machine-readable
+control model define the hosted-service boundary; and NG-CAPACITY-001 provides a
+digest-bound capacity harness. These are execution prerequisites, not closure
+evidence. No reviewer has signed B-001, no hosted boundary has implemented B-002,
+and no representative target-infrastructure run has closed B-003.
+
 The synthetic pilot did not close or change the required scope of any blocker. These
 blockers prevent stronger claims and any deployment matching their declared scope.
 
