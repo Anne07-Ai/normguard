@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "classification": "synthetic",
+  "cases": [
+    {
+      "text": "SYNTH-SKU-42 SYNTHETIC LIMITED",
+      "expected_output": "SYNTH-SKU-42 Synthetic",
+      "expected_status": "success"
+    },
+    {
+      "text": "AMBIGUOUS-SYNTH",
+      "expected_output": "AMBIGUOUS-SYNTH",
+      "expected_status": "review_required"
+    }
+  ]
+}
