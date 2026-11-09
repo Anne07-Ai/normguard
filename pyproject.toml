@@ -40,6 +40,10 @@ research = [
   "numpy>=2.0,<3",
   "spacy==3.8.16",
 ]
+service = [
+    "fastapi>=0.115,<0.116",
+    "uvicorn>=0.34,<0.35",
+]
 
 [project.urls]
 Homepage = "https://github.com/Anne07-Ai/normguard"
@@ -48,6 +52,7 @@ Repository = "https://github.com/Anne07-Ai/normguard"
 
 [dependency-groups]
 dev = [
+  "httpx>=0.28,<1",
   "hypothesis>=6.115,<7",
   "pytest>=8,<10",
   "ruff>=0.11,<1",
