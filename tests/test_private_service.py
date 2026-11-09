@@ -42,7 +42,7 @@ def _client(*, requests_per_minute: int = 120) -> TestClient:
 
 
 def _headers(token: str = TOKEN) -> dict[str, str]:
-    return {"Authorization": f"Bearer {token}"}
+    return {"X-NormGuard-Token": token}
 
 
 class PrivateServiceTests(unittest.TestCase):
@@ -58,7 +58,11 @@ class PrivateServiceTests(unittest.TestCase):
 
     def test_authentication_is_deny_by_default_and_never_echoes_token(self) -> None:
         client = _client()
-        for headers in ({}, _headers("wrong-token-with-at-least-thirty-two-chars")):
+        for headers in (
+            {},
+            {"Authorization": f"Bearer {TOKEN}"},
+            _headers("wrong-token-with-at-least-thirty-two-chars"),
+        ):
             response = client.post("/v1/normalise", json={"text": "ACME LTD"}, headers=headers)
             self.assertEqual(response.status_code, 401)
             self.assertEqual(response.json()["error_code"], "UNAUTHENTICATED")
