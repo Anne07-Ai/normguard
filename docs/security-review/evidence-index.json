@@ -1,0 +1,31 @@
+{
+  "component": "normguard-safety-core",
+  "decision_boundary": "review-preparation-only",
+  "schema_version": 1,
+  "threats": [
+    {"id": "NG-T01", "disposition": "CONTROLLED", "evidence": ["src/normguard/safety_contracts.py", "tests/test_safety_contracts.py"]},
+    {"id": "NG-T02", "disposition": "CONTROLLED", "evidence": ["src/normguard/policy_verification.py", "tests/test_policy_verification.py"]},
+    {"id": "NG-T03", "disposition": "CONTROLLED", "evidence": ["docs/adr/0004-policy-signing-and-rollback.md", "tests/test_policy_verification.py"]},
+    {"id": "NG-T04", "disposition": "CONTROLLED", "evidence": ["src/normguard/safety_contracts.py", "tests/test_safety_contracts.py"]},
+    {"id": "NG-T05", "disposition": "CONTROLLED", "evidence": ["src/normguard/normalisation.py", "tests/test_adversarial_properties.py"]},
+    {"id": "NG-T06", "disposition": "CONTROLLED", "evidence": ["docs/adversarial-testing.md", "tests/test_adversarial_properties.py"]},
+    {"id": "NG-T07", "disposition": "CONTROLLED", "evidence": ["src/normguard/runtime.py", "tests/test_runtime.py"]},
+    {"id": "NG-T08", "disposition": "CONTROLLED", "evidence": ["src/normguard/runtime.py", "tests/test_adversarial_properties.py"]},
+    {"id": "NG-T09", "disposition": "CONTROLLED", "evidence": ["tests/test_adversarial_properties.py", "tests/fixtures/offset-preservation.json"]},
+    {"id": "NG-T10", "disposition": "CONTROLLED", "evidence": ["src/normguard/observability.py", "tests/test_observability.py"]},
+    {"id": "NG-T11", "disposition": "ACCEPTED_RESIDUAL_RISK", "evidence": ["docs/threat-model-safety-core.md", "docs/policy-operations-runbook.md"]},
+    {"id": "NG-T12", "disposition": "CONTROLLED", "evidence": ["src/normguard/cli.py", "tests/test_cli.py"]},
+    {"id": "NG-T13", "disposition": "CONTROLLED", "evidence": ["src/normguard/sdk.py", "tests/test_sdk.py"]},
+    {"id": "NG-T14", "disposition": "CONTROLLED", "evidence": ["docs/release-artifact-gate.md", ".github/workflows/release-artifacts.yml"]},
+    {"id": "NG-T15", "disposition": "CONTROLLED", "evidence": ["src/normguard/pilot.py", "tests/test_pilot.py"]},
+    {"id": "NG-T16", "disposition": "CONTROLLED", "evidence": ["src/normguard/sdk.py", "tests/test_integration_example.py"]},
+    {"id": "NG-T17", "disposition": "CONTROLLED", "evidence": ["src/normguard/runtime.py", "tests/test_runtime.py"]},
+    {"id": "NG-T18", "disposition": "CONTROLLED", "evidence": ["src/normguard/sdk.py", "tests/test_sdk.py"]},
+    {"id": "NG-T19", "disposition": "CONTROLLED", "evidence": ["src/normguard/observability.py", "tests/test_observability.py"]},
+    {"id": "NG-T20", "disposition": "CONTROLLED", "evidence": ["src/normguard/safety_contracts.py", "tests/test_safety_contracts.py"]},
+    {"id": "NG-T21", "disposition": "CONTROLLED", "evidence": ["docs/adr/0004-policy-signing-and-rollback.md", "tests/test_policy_verification.py"]},
+    {"id": "NG-T22", "disposition": "BLOCKED_FOR_HOSTED_SERVICE", "evidence": ["docs/threat-model-safety-core.md", "docs/releases/safety-core-phase-3-readiness.json"]},
+    {"id": "NG-T23", "disposition": "CONTROLLED", "evidence": ["examples/integrations/service.py", "tests/test_integration_example.py"]},
+    {"id": "NG-T24", "disposition": "CONTROLLED", "evidence": ["src/normguard/policy_verification.py", "tests/test_policy_verification.py"]}
+  ]
+}
