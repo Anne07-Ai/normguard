@@ -28,7 +28,7 @@
     }
   ],
   "component": "normguard-safety-core",
-  "decision": "READY_FOR_CONTROLLED_PILOT",
+  "decision": "CONTROLLED_PILOT_COMPLETED",
   "gates": [
     {
       "evidence": [
@@ -134,6 +134,19 @@
       "name": "non-publishing package artifact gate",
       "owner": "release-owner",
       "status": "PASS"
+    },
+    {
+      "evidence": [
+        "docs/pilots/controlled-pilot-plan.md",
+        "docs/pilots/controlled-pilot-evidence.schema.json",
+        ".github/workflows/controlled-pilot.yml",
+        "scripts/run_synthetic_controlled_pilot.py",
+        "tests/test_synthetic_pilot_execution.py"
+      ],
+      "id": "G-11",
+      "name": "synthetic controlled pilot execution",
+      "owner": "pilot-owner",
+      "status": "PASS"
     }
   ],
   "non_claims": [
@@ -182,7 +195,7 @@
       "summary": "Offline operation does not eliminate software supply-chain risk"
     }
   ],
-  "review_date": "2026-10-23",
+  "review_date": "2026-11-09",
   "schema_version": 1,
   "sealed_data_status": "development-and-official-test-not-read-or-transformed",
   "threat_dispositions": [
