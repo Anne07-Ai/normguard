@@ -2,7 +2,7 @@
 
 ![NormGuard — text normalisation, measured before it ships](docs/assets/normguard-banner.svg)
 
-[![Phase](https://img.shields.io/badge/safety%20core-phase%203%20reviewed-0f766e?style=for-the-badge)](docs/releases/safety-core-phase-3-readiness.md)
+[![Phase](https://img.shields.io/badge/safety%20core-controlled%20pilot%20completed-0f766e?style=for-the-badge)](docs/releases/safety-core-phase-3-readiness.md)
 [![Decision](https://img.shields.io/badge/decision-utility%20not%20supported-b45309?style=for-the-badge)](docs/adr/0002-stop-general-lemmatisation.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-334155?style=for-the-badge)](LICENSE)
 
@@ -27,10 +27,10 @@
 > retrieval recommendation.
 
 > [!NOTE]
-> The separate Safety Core Phase 3 vertical slice is a
-> `READY_FOR_CONTROLLED_PILOT` library candidate for offline or single-tenant
-> integration. It is not approved as a hosted multi-tenant service or an external
-> production-readiness claim. See the
+> The separate Safety Core vertical slice has completed its first synthetic controlled
+> pilot for offline or single-tenant integration. Its decision is
+> `CONTROLLED_PILOT_COMPLETED`; this is not independent security assurance, approval
+> for a hosted multi-tenant service or an external production-readiness claim. See the
 > [release-readiness review](docs/releases/safety-core-phase-3-readiness.md).
 
 ## Research outcome

@@ -32,8 +32,8 @@ class ReleaseReadinessTests(unittest.TestCase):
             },
         )
         self.assertEqual(self.record["schema_version"], 1)
-        self.assertEqual(self.record["decision"], "READY_FOR_CONTROLLED_PILOT")
-        self.assertEqual(self.record["review_date"], "2026-10-23")
+        self.assertEqual(self.record["decision"], "CONTROLLED_PILOT_COMPLETED")
+        self.assertEqual(self.record["review_date"], "2026-11-09")
         self.assertEqual(
             self.record["sealed_data_status"],
             "development-and-official-test-not-read-or-transformed",
@@ -44,7 +44,7 @@ class ReleaseReadinessTests(unittest.TestCase):
     def test_all_gates_have_unique_ids_owners_pass_status_and_existing_evidence(self) -> None:
         gates = self.record["gates"]
         self.assertEqual(len({gate["id"] for gate in gates}), len(gates))
-        self.assertGreaterEqual(len(gates), 10)
+        self.assertGreaterEqual(len(gates), 11)
         for gate in gates:
             with self.subTest(gate=gate["id"]):
                 self.assertEqual(
@@ -73,6 +73,40 @@ class ReleaseReadinessTests(unittest.TestCase):
                     self.assertRegex(item["id"], r"^[BR]-\d{3}$")
                     self.assertTrue(item["owner"])
                     self.assertTrue(item["summary"])
+
+    def test_pilot_gate_exists_without_closing_production_blockers(self) -> None:
+        gates = {gate["id"]: gate for gate in self.record["gates"]}
+        self.assertEqual(gates["G-11"]["name"], "synthetic controlled pilot execution")
+        self.assertEqual(gates["G-11"]["status"], "PASS")
+
+        blockers = {item["id"]: item for item in self.record["blockers"]}
+        self.assertEqual(set(blockers), {"B-001", "B-002", "B-003"})
+        self.assertEqual(blockers["B-001"]["status"], "OPEN")
+        self.assertEqual(blockers["B-002"]["status"], "BLOCKED")
+        self.assertEqual(blockers["B-003"]["status"], "OPEN")
+        self.assertEqual(
+            blockers["B-001"]["required_for"],
+            "external production-readiness claim",
+        )
+        self.assertEqual(
+            blockers["B-002"]["required_for"],
+            "hosted or multi-tenant service",
+        )
+        self.assertEqual(
+            blockers["B-003"]["required_for"],
+            "production SLA or capacity claim",
+        )
+
+    def test_report_preserves_non_claims_and_independent_review_boundary(self) -> None:
+        report = REPORT.read_text(encoding="utf-8")
+        normalized_report = " ".join(report.split())
+        for required in (
+            "not independent assurance",
+            "not “production ready,” independently certified",
+            "NG-T22 remains an explicit blocker",
+            "The synthetic pilot did not close or change",
+        ):
+            self.assertIn(required, normalized_report)
 
     def test_report_links_resolve_and_readme_links_decision(self) -> None:
         text = REPORT.read_text(encoding="utf-8")

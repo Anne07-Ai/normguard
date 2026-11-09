@@ -1,15 +1,16 @@
-# Safety Core Phase 3 release-readiness review
+# Safety Core Phase 3/4 release-readiness review
 
-- **Review date:** 23 October 2026
+- **Review date:** 9 November 2026
 - **Candidate:** NormGuard Safety Core 0.1.0
-- **Decision:** `READY_FOR_CONTROLLED_PILOT`
+- **Decision:** `CONTROLLED_PILOT_COMPLETED`
 - **Publication:** not performed or authorized by this review
 
 ## Executive decision
 
-The Safety Core engineering vertical slice is complete enough for a controlled,
-offline or single-tenant library pilot using signed policies, bounded runtime
-limits, explicit review routing and the documented operational controls.
+The Safety Core engineering vertical slice completed its first synthetic controlled,
+offline/single-tenant library pilot using signed policies, bounded runtime limits,
+explicit review routing and the documented operational controls. NG-PILOT-001 returned
+`PASS` for all eight hard gates on the exact wheel exercised by the read-only workflow.
 
 It is **not approved** as a hosted multi-tenant service, an unrestricted external
 production release or a production retrieval recommendation. Independent security
@@ -49,6 +50,10 @@ review and platform operation before a real workload is introduced.
 - No claim of universal semantic correctness, production SLA or formal security
   certification.
 
+The pilot is internal engineering evidence, not independent assurance. It does not
+close the independent security review, hosted-service controls or representative
+capacity blockers below.
+
 ## Evidence-based gates
 
 | Gate | Result | Evidence |
@@ -63,6 +68,7 @@ review and platform operation before a real workload is introduced.
 | Operations and incident response | PASS | runbook and change-ticket checklist |
 | Production integration pattern | PASS | fail-closed startup, atomic reload and concurrent tests |
 | Package artifact gate | PASS | clean wheel install, metadata, SBOM and digest evidence |
+| Synthetic controlled pilot | PASS | NG-PILOT-001 runner, closed evidence schema, execution tests and read-only workflow |
 
 The complete path-level evidence inventory and named control owners are in the
 machine-readable record. CI outcomes on the review pull request are release evidence;
@@ -87,8 +93,8 @@ isolation. Building a web endpoint around it does not satisfy that threat.
 | NG-T22 service controls | Hosted/multi-tenant deployment | Adopting service owner | AuthN/AuthZ, isolation, rate-limit and tenant-leakage tests |
 | Representative capacity test | Production SLA/capacity claim | Adopting platform owner | Sustained workload report on target infrastructure |
 
-These blockers do not prevent synthetic evaluation or a controlled single-tenant
-pilot, but they prevent stronger claims.
+The synthetic pilot did not close or change the required scope of any blocker. These
+blockers prevent stronger claims and any deployment matching their declared scope.
 
 ## Residual risk ownership
 
@@ -104,9 +110,10 @@ pilot, but they prevent stronger claims.
 
 ## Data and research boundary
 
-Phase 3 tests use synthetic fixtures. The ESCI development and official-test
-partitions were not read or transformed. Phase 2's retrieval decision remains
-`STOP`: the utility hypothesis was not supported, and Phase 3 does not revive it.
+Phase 3 tests and the Phase 4 controlled pilot use synthetic fixtures. The ESCI
+development and official-test partitions were not read or transformed. Phase 2's
+retrieval decision remains `STOP`: the utility hypothesis was not supported, and the
+pilot does not revive it.
 
 ## Promotion path
 
@@ -118,7 +125,8 @@ Before any external production claim:
 4. implement/test NG-T22 if a service or tenant boundary is introduced;
 5. create a separate protected publication issue/workflow using OIDC trusted
    publishing and immutable tag-to-artifact verification;
-6. rerun all four required workflows on the exact release commit;
+6. rerun all required workflows on the exact release commit;
 7. approve release notes containing these supported scopes and non-claims.
 
-Until then, the honest status is controlled-pilot candidate—not “production ready.”
+Until then, the honest status is synthetic controlled pilot completed—not
+“production ready,” independently certified or approved for hosted service.
