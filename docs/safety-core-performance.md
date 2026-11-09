@@ -32,8 +32,10 @@ semantic comparability changes.
 Run locally with the core-only installation:
 
 ```bash
-uv sync --locked --no-dev
-uv run --locked --no-dev python -m normguard.performance
+uv build --wheel --no-sources
+uv venv --seed .performance-venv
+uv pip install --python .performance-venv/bin/python dist/*.whl
+.performance-venv/bin/python -m normguard.performance
 ```
 
 The command writes canonical JSON to
