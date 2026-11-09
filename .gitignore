@@ -216,6 +216,7 @@ tempCodeRunnerFile.py
 data/
 *.parquet
 artifacts/
+pilot-secrets/
 
 # Marimo
 marimo/_static/
