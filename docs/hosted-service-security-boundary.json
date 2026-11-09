@@ -1,0 +1,63 @@
+{
+  "blocker": {
+    "id": "B-002",
+    "required_for": "hosted or multi-tenant service",
+    "status": "BLOCKED"
+  },
+  "closure_requirements": [
+    "implemented authentication and deny-by-default tenant authorization",
+    "implemented tenant-scoped policy, activation, cache, storage and telemetry",
+    "passing cross-tenant adversarial and concurrency evidence",
+    "passing rate-limit and failure-injection evidence",
+    "independent security review with findings resolved or risk-accepted"
+  ],
+  "component": "future-hosted-service-adapter",
+  "mandatory_controls": [
+    {
+      "id": "HS-01",
+      "name": "verified principal identity",
+      "owner": "identity-owner"
+    },
+    {
+      "id": "HS-02",
+      "name": "deny-by-default tenant authorization",
+      "owner": "service-owner"
+    },
+    {
+      "id": "HS-03",
+      "name": "tenant-scoped policy and activation state",
+      "owner": "policy-owner"
+    },
+    {
+      "id": "HS-04",
+      "name": "tenant-scoped storage and cache",
+      "owner": "data-owner"
+    },
+    {
+      "id": "HS-05",
+      "name": "principal tenant and deployment quotas",
+      "owner": "platform-owner"
+    },
+    {
+      "id": "HS-06",
+      "name": "tenant-safe errors audit and telemetry",
+      "owner": "observability-owner"
+    },
+    {
+      "id": "HS-07",
+      "name": "cross-tenant adversarial isolation tests",
+      "owner": "security-test-owner"
+    }
+  ],
+  "non_claims": [
+    "design does not implement a hosted endpoint",
+    "design does not close NG-T22 or B-002",
+    "design does not authorize production deployment",
+    "design is not independent security assurance"
+  ],
+  "schema_version": 1,
+  "threat": {
+    "id": "NG-T22",
+    "status": "BLOCKED_FOR_HOSTED_SERVICE"
+  }
+}
