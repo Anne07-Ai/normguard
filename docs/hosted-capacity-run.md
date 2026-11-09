@@ -11,14 +11,18 @@ close B-001, or remove the B-002/NG-T22 hosted-service restriction.
 | Field | Value |
 |---|---:|
 | Profile | `hf-cpu-basic-private-pilot@1.0.0` |
-| Duration | at least 300 seconds |
+| Measured duration | at least 600 seconds |
 | Measured requests | 1,000 |
 | Warm-up requests | 20 |
 | Concurrency | 4 |
-| Arrival rate | approximately 3.33 requests/second |
+| Arrival rate | approximately 1.67 requests/second (100/minute) |
 | p95 budget | 1,000 ms |
-| Minimum throughput | 3 requests/second |
+| Minimum throughput | 1.5 requests/second |
 | Maximum error rate | 0 |
+
+The runner waits 61 seconds before warm-up and another 61 seconds before measurement
+so the service's 120-request fixed window cannot be contaminated by prior checks or
+warm-up traffic. Expected wall-clock time is approximately 12 minutes.
 
 Inputs are bounded synthetic strings defined in
 `src/normguard/hosted_capacity.py`. Raw requests, response bodies, credentials and
