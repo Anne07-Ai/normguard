@@ -1,0 +1,106 @@
+name: Controlled Safety Core pilot
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  controlled-pilot:
+    name: Execute synthetic controlled pilot
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out exact source commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.18"
+          enable-cache: true
+
+      - name: Build exact wheel artifact
+        run: uv build --wheel --no-sources
+
+      - name: Install wheel in clean pilot environment
+        run: |
+          uv venv --seed .pilot-venv
+          uv pip install --python .pilot-venv/bin/python dist/*.whl
+
+      - name: Execute controlled pilot
+        run: |
+          source_commit=$(git rev-parse HEAD)
+          wheel=$(find dist -name '*.whl' -type f -print -quit)
+          test -n "$wheel"
+          .pilot-venv/bin/python scripts/run_synthetic_controlled_pilot.py \
+            --wheel "$wheel" \
+            --source-commit "$source_commit" \
+            --output-dir artifacts/controlled-pilot
+
+      - name: Verify generated evidence with installed wheel
+        run: |
+          .pilot-venv/bin/python - <<'PY'
+          import json
+          from pathlib import Path
+
+          from normguard import verify_pilot_envelope
+
+          path = Path("artifacts/controlled-pilot/controlled-pilot-evidence.json")
+          envelope = json.loads(path.read_text(encoding="utf-8"))
+          verify_pilot_envelope(envelope)
+          assert envelope["record"]["decision"] == "PASS"
+          assert all(gate["status"] == "PASS" for gate in envelope["record"]["gates"])
+          PY
+
+      - name: Publish bounded job summary
+        run: |
+          .pilot-venv/bin/python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          evidence = json.loads(
+              Path("artifacts/controlled-pilot/controlled-pilot-evidence.json").read_text()
+          )
+          record = evidence["record"]
+          identities = record["identities"]
+          rows = "\n".join(
+              f"| {gate['id']} | {gate['status']} |" for gate in record["gates"]
+          )
+          summary = (
+              "# NormGuard controlled pilot\n\n"
+              f"**Decision:** {record['decision']}\n\n"
+              f"**Source commit:** `{identities['source_commit']}`\n\n"
+              f"**Wheel SHA-256:** `{identities['artifact_sha256']}`\n\n"
+              f"**Evidence SHA-256:** `{evidence['record_sha256']}`\n\n"
+              "| Gate | Result |\n|---|---|\n"
+              f"{rows}\n\n"
+              "Synthetic offline/single-tenant evidence only; no production authorization.\n"
+          )
+          Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text(
+              summary,
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Upload controlled-pilot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: normguard-controlled-pilot-${{ github.sha }}
+          path: artifacts/controlled-pilot/
+          if-no-files-found: error
+          retention-days: 30
