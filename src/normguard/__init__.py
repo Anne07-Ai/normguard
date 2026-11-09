@@ -31,6 +31,20 @@ from .observability import (
     TelemetrySink,
     TelemetryStatus,
 )
+from .pilot import (
+    PILOT_PROTOCOL_VERSION,
+    PILOT_SCHEMA_VERSION,
+    DataClassification,
+    GateStatus,
+    OperationalDrill,
+    PilotCase,
+    PilotConfig,
+    PilotDecision,
+    PilotGate,
+    run_controlled_pilot,
+    verify_pilot_envelope,
+    write_pilot_artifacts,
+)
 from .runtime import (
     BoundedSafetyRuntime,
     RuntimeCode,
@@ -94,6 +108,8 @@ def __getattr__(name: str) -> Any:
 
 __all__ = [
     "OBSERVABILITY_SCHEMA_VERSION",
+    "PILOT_PROTOCOL_VERSION",
+    "PILOT_SCHEMA_VERSION",
     "SDK_SCHEMA_VERSION",
     "SDK_VERSION",
     "AdapterMetadata",
@@ -102,6 +118,7 @@ __all__ = [
     "BoundedSafetyRuntime",
     "C0Adapter",
     "C4SpacyAdapter",
+    "DataClassification",
     "Decision",
     "DecisionEvidence",
     "EsciPartition",
@@ -110,14 +127,20 @@ __all__ = [
     "ExperimentReport",
     "Failure",
     "FailureCode",
+    "GateStatus",
     "JsonLinesTelemetrySink",
     "LoadedPolicy",
     "MetricName",
     "NormalisationAdapter",
     "NormalisationResult",
     "ObservedSpan",
+    "OperationalDrill",
     "PairedComparison",
     "PairedStatistics",
+    "PilotCase",
+    "PilotConfig",
+    "PilotDecision",
+    "PilotGate",
     "PolicyClass",
     "PolicyRule",
     "ProtectedNormaliser",
@@ -154,8 +177,11 @@ __all__ = [
     "load_policy",
     "paired_statistics",
     "require_development_approval",
+    "run_controlled_pilot",
     "select_bm25_parameters",
+    "verify_pilot_envelope",
     "verify_policy",
+    "write_pilot_artifacts",
 ]
 
 __version__ = "0.1.0"
