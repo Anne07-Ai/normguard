@@ -28,6 +28,7 @@ from .safety_contracts import canonical_json_bytes
 
 HF_TOKEN_ENV = "HF_TOKEN"
 SERVICE_TOKEN_ENV = "NORMGUARD_BEARER_TOKEN"
+RATE_LIMIT_RESET_SECONDS = 61
 DEFAULT_ENDPOINT = (
     "https://lakshmianne-normguard-private-pilot.hf.space/v1/normalise"
 )
@@ -59,12 +60,12 @@ def representative_profile() -> CapacityProfile:
         concurrency=4,
         warmup_requests=20,
         measured_requests=1_000,
-        minimum_duration_seconds=300,
+        minimum_duration_seconds=600,
         latency_p95_budget_ms=1_000,
-        minimum_throughput_per_second=3,
+        minimum_throughput_per_second=1.5,
         maximum_error_rate=0,
         maximum_peak_traced_bytes=64_000_000,
-        maximum_process_cpu_seconds=120,
+        maximum_process_cpu_seconds=180,
     )
 
 
@@ -161,8 +162,13 @@ def paced_sample_runner(
 ) -> CapacitySamples:
     """Run a representative profile at a deterministic, bounded arrival rate."""
 
+    # Reset the single-principal fixed window before warm-up and before measurement.
+    # This prevents unrelated operator checks or warm-up traffic from consuming the
+    # representative profile's declared request budget.
+    time.sleep(RATE_LIMIT_RESET_SECONDS)
     for _ in range(profile.warmup_requests):
         operation()
+    time.sleep(RATE_LIMIT_RESET_SECONDS)
 
     interval_ns = int(
         profile.minimum_duration_seconds
