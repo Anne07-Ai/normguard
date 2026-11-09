@@ -30,11 +30,16 @@ jobs:
           version: "0.12.18"
           enable-cache: true
 
-      - name: Install core-only locked environment
-        run: uv sync --locked --no-dev
+      - name: Build exact wheel artifact
+        run: uv build --wheel --no-sources
+
+      - name: Install wheel in clean core-only environment
+        run: |
+          uv venv --seed .performance-venv
+          uv pip install --python .performance-venv/bin/python dist/*.whl
 
       - name: Run frozen performance contract
-        run: uv run --locked --no-dev python -m normguard.performance
+        run: .performance-venv/bin/python -m normguard.performance
 
       - name: Upload performance evidence
         uses: actions/upload-artifact@v4
