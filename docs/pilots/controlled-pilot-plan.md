@@ -70,6 +70,30 @@ and [`synthetic report`](../../examples/pilots/controlled-pilot-report.example.m
 demonstrate the closed output contract. Placeholder commit/artifact/drill digests in
 that example are not evidence for a real deployment.
 
+## First synthetic execution workflow
+
+The read-only [`controlled-pilot.yml`](../../.github/workflows/controlled-pilot.yml)
+workflow executes the first synthetic pilot on every pull request and `main` push.
+It builds and installs the exact wheel, binds the checked-out full commit and wheel
+SHA-256 into evidence, creates an ephemeral in-memory signing key, exercises rollback
+and revoked-key candidate rejection, and uploads the JSON evidence plus Markdown report.
+
+The job has no publishing credentials and retains artifacts for 30 days. Its evidence
+is execution proof for the declared GitHub-hosted runner only; variable shared-runner
+hardware means the performance result is a regression signal, not a production SLA.
+The ephemeral private key, signed bundle, trust store and raw synthetic cases are not
+written to the artifact or job summary.
+
+Local execution against a built wheel uses the same runner:
+
+```bash
+uv build --wheel --no-sources
+python scripts/run_synthetic_controlled_pilot.py \
+  --wheel dist/normguard-0.1.0-py3-none-any.whl \
+  --source-commit "$(git rev-parse HEAD)" \
+  --output-dir artifacts/controlled-pilot
+```
+
 The example corpus at
 [`examples/pilots/synthetic-cases.json`](../../examples/pilots/synthetic-cases.json)
 contains no customer data. A real pilot must use a separate organization-approved
