@@ -106,9 +106,10 @@ observed p95 latency of 576.899375 ms and throughput of
 1.6654235372894997 requests/second. Client process CPU and `tracemalloc`
 observations are not Hugging Face server CPU or RSS.
 
-This result supports only the digest-bound pilot environment and workload. It does
-not authorize customer data, public or multi-tenant hosting, a production SLA or a
-general capacity claim. B-001 remains `OPEN`, B-002 remains `BLOCKED`, NG-T22
+The synthetic pilot did not close or change the required production scope of any
+blocker. This result supports only the digest-bound pilot environment and workload.
+It does not authorize customer data, public or multi-tenant hosting, a production SLA
+or a general capacity claim. B-001 remains `OPEN`, B-002 remains `BLOCKED`, NG-T22
 remains `BLOCKED_FOR_HOSTED_SERVICE`, and B-003 remains `OPEN` for its declared
 production scope. These blockers prevent stronger claims and any deployment matching
 their declared scope.
