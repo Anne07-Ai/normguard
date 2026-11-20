@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RECORD = ROOT / "docs" / "releases" / "safety-core-phase-3-readiness.json"
 REPORT = ROOT / "docs" / "releases" / "safety-core-phase-3-readiness.md"
+PILOT_CAPACITY = ROOT / "docs" / "releases" / "hf-private-pilot-capacity.json"
 
 
 class ReleaseReadinessTests(unittest.TestCase):
@@ -126,6 +127,43 @@ class ReleaseReadinessTests(unittest.TestCase):
         self.assertEqual(
             blockers["B-003"]["required_for"],
             "production SLA or capacity claim",
+        )
+
+    def test_private_pilot_capacity_is_scoped_and_digest_bound(self) -> None:
+        capacity = json.loads(PILOT_CAPACITY.read_text(encoding="utf-8"))
+        self.assertEqual(capacity["schema_version"], 1)
+        self.assertEqual(capacity["protocol"], "NG-CAPACITY-001")
+        self.assertEqual(capacity["decision"], "PASS")
+        self.assertEqual(
+            capacity["scope"], "private-single-tenant-hf-cpu-basic-pilot"
+        )
+        self.assertEqual(
+            capacity["evidence_sha256"],
+            "767784bb21f19695aef17cc5b3fa8cfc57a4c42e49dbbc96e8fb37a47d63a334",
+        )
+        self.assertEqual(capacity["metrics"]["measured_requests"], 1_000)
+        self.assertEqual(capacity["metrics"]["error_count"], 0)
+        self.assertEqual(capacity["metrics"]["latency_p95_ms"], 576.899375)
+        self.assertEqual(
+            capacity["metrics"]["throughput_per_second"], 1.6654235372894997
+        )
+        self.assertEqual(
+            capacity["resource_observation"]["server_cpu_rss_throttling_saturation"],
+            "not-observed",
+        )
+        self.assertEqual(capacity["data_boundary"], "bounded-synthetic-inputs-only")
+        self.assertIn(
+            "not a production SLA or general capacity claim",
+            capacity["non_claims"],
+        )
+
+        blockers = {item["id"]: item for item in self.record["blockers"]}
+        self.assertEqual(blockers["B-001"]["status"], "OPEN")
+        self.assertEqual(blockers["B-002"]["status"], "BLOCKED")
+        self.assertEqual(blockers["B-003"]["status"], "OPEN")
+        self.assertIn(
+            "docs/releases/hf-private-pilot-capacity.json",
+            blockers["B-003"]["preparation_evidence"],
         )
 
     def test_report_preserves_non_claims_and_independent_review_boundary(self) -> None:
