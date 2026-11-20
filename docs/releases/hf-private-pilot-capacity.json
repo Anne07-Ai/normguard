@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "protocol": "NG-CAPACITY-001",
+  "scope": "private-single-tenant-hf-cpu-basic-pilot",
+  "decision": "PASS",
+  "evidence_sha256": "767784bb21f19695aef17cc5b3fa8cfc57a4c42e49dbbc96e8fb37a47d63a334",
+  "identities": {
+    "source_commit": "c0228545f9ca5f6b931189ab59049da57eabdc77",
+    "artifact_sha256": "71bc50f538ae3886b57b31a3e063bb274876667e4c60af3aa6fcb2fb8f1e35f1",
+    "target_environment_sha256": "779255e1beb6339981c7acd3d824641b963638a38aa8b94918d480a07cf3626d",
+    "profile_sha256": "0ce53ecbfa85a47d58dfb74b551bff7026386c5982359918973308a2e4214694",
+    "workload_sha256": "825be10e9792cc2d588f5bbee615d3102109bc64b34b0af2ff0ae4d7445767b1"
+  },
+  "metrics": {
+    "measured_requests": 1000,
+    "observed_duration_seconds": 600.447860625,
+    "error_count": 0,
+    "error_rate": 0,
+    "latency_p50_ms": 388.223291,
+    "latency_p95_ms": 576.899375,
+    "latency_max_ms": 1308.573292,
+    "throughput_per_second": 1.6654235372894997
+  },
+  "budgets": {
+    "latency_p95_ms": 1000,
+    "minimum_throughput_per_second": 1.5,
+    "maximum_error_rate": 0
+  },
+  "resource_observation": {
+    "client_peak_traced_bytes": 1990875,
+    "client_process_cpu_seconds": 7.826332,
+    "server_cpu_rss_throttling_saturation": "not-observed"
+  },
+  "data_boundary": "bounded-synthetic-inputs-only",
+  "non_claims": [
+    "not public or multi-tenant service approval",
+    "not customer-data approval",
+    "not a production SLA or general capacity claim",
+    "client process CPU and tracemalloc are not Hugging Face server CPU or RSS",
+    "does not close B-001, B-002, B-003 or NG-T22"
+  ]
+}
