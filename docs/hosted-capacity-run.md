@@ -126,3 +126,21 @@ metrics as server metrics.
 
 A passing envelope supports only the declared private CPU Basic pilot and workload.
 B-003 remains open for any production SLA or general capacity claim.
+
+## Recorded private-pilot result
+
+The canonical, secret-free readiness summary is
+[`hf-private-pilot-capacity.json`](releases/hf-private-pilot-capacity.json).
+Its evidence digest is
+`767784bb21f19695aef17cc5b3fa8cfc57a4c42e49dbbc96e8fb37a47d63a334`.
+
+The declared run completed 1,000 measured synthetic requests over 600.447860625
+seconds with zero errors. Observed p95 latency was 576.899375 ms against a
+1,000 ms budget, and throughput was 1.6654235372894997 requests/second against
+a 1.5 requests/second minimum.
+
+This `PASS` is limited to the exact private, single-tenant Hugging Face CPU
+Basic pilot, source commit, artifact, environment, profile and workload digests
+recorded in the canonical summary. It authorizes neither customer data nor a
+public, multi-tenant, production-SLA or general-capacity claim. Client process
+CPU and `tracemalloc` observations are not Hugging Face server CPU or RSS.
