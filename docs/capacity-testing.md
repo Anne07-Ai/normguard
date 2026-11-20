@@ -65,7 +65,9 @@ outside the library envelope and bind that evidence in the adopter's change reco
 
 ## Blocker status
 
-Release blocker B-003 remains `OPEN`. This harness prepares the reproducible contract;
-only a passing run on declared representative infrastructure, reviewed by the adopting
-platform owner, can support a capacity claim. It does not close B-001 independent
-security review or B-002/NG-T22 hosted-service controls.
+Release blocker B-003 remains `OPEN` for any production SLA or general capacity
+claim. The digest-bound private Hugging Face CPU Basic pilot result supports only its
+exact declared single-tenant environment and synthetic workload; it is recorded in
+[`hf-private-pilot-capacity.json`](releases/hf-private-pilot-capacity.json).
+That scoped pass does not close B-001 independent security review, B-002/NG-T22
+hosted-service controls, or the production scope of B-003.
