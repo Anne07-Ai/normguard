@@ -37,11 +37,12 @@
       "owner": "adopting-platform-owner",
       "preparation_evidence": [
         "docs/capacity-testing.md",
-        "src/normguard/capacity.py"
+        "src/normguard/capacity.py",
+        "docs/releases/hf-private-pilot-capacity.json"
       ],
       "required_for": "production SLA or capacity claim",
       "status": "OPEN",
-      "summary": "Representative sustained load, host memory and concurrency sizing are deployment-specific"
+      "summary": "The exact private single-tenant Hugging Face CPU Basic pilot passed its declared workload; production SLA and general capacity evidence remain deployment-specific"
     }
   ],
   "component": "normguard-safety-core",
