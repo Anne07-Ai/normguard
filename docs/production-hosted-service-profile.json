@@ -1,0 +1,107 @@
+{
+  "blockers": {
+    "B-001": "OPEN",
+    "B-002": "BLOCKED",
+    "B-003": "OPEN"
+  },
+  "controls": [
+    {
+      "evidence_required": "OIDC validation and credential-adversarial test evidence",
+      "enforcement_point": "API Gateway and identity adapter",
+      "id": "HS-01",
+      "name": "verified principal identity",
+      "owner": "identity-owner"
+    },
+    {
+      "evidence_required": "authorization contract and horizontal/vertical escalation tests",
+      "enforcement_point": "service authorization layer",
+      "id": "HS-02",
+      "name": "deny-by-default tenant authorization",
+      "owner": "service-owner"
+    },
+    {
+      "evidence_required": "policy substitution, activation and rollback tests per tenant",
+      "enforcement_point": "policy repository and Safety Core boundary",
+      "id": "HS-03",
+      "name": "tenant-scoped policy and activation state",
+      "owner": "policy-owner"
+    },
+    {
+      "evidence_required": "row-isolation, cache-poisoning and tenant-restore tests",
+      "enforcement_point": "PostgreSQL repositories and Redis keyspace",
+      "id": "HS-04",
+      "name": "tenant-scoped storage and cache",
+      "owner": "data-owner"
+    },
+    {
+      "evidence_required": "principal, tenant and deployment saturation/failure tests",
+      "enforcement_point": "service quota layer and Redis",
+      "id": "HS-05",
+      "name": "principal tenant and deployment quotas",
+      "owner": "platform-owner"
+    },
+    {
+      "evidence_required": "log, metric, trace, error and audit leakage tests",
+      "enforcement_point": "error mapper and observability adapters",
+      "id": "HS-06",
+      "name": "tenant-safe errors audit and telemetry",
+      "owner": "observability-owner"
+    },
+    {
+      "evidence_required": "independent adversarial isolation report for the exact artifact",
+      "enforcement_point": "CI and production-like test environment",
+      "id": "HS-07",
+      "name": "cross-tenant adversarial isolation tests",
+      "owner": "security-test-owner"
+    }
+  ],
+  "data_handling": {
+    "audit_retention_days": 90,
+    "content_persistence": "prohibited",
+    "customer_data_before_readiness": "prohibited",
+    "metrics_tenant_labels": "prohibited",
+    "raw_content_telemetry": "prohibited"
+  },
+  "identity": {
+    "authorization_source": "authoritative active tenant grant",
+    "credential": "OIDC JWT",
+    "effective_tenant_from_client_input": false,
+    "required_validation": [
+      "signature",
+      "issuer",
+      "audience",
+      "expiry"
+    ]
+  },
+  "non_claims": [
+    "profile does not implement a hosted service",
+    "profile does not close B-001 B-002 or B-003",
+    "profile does not change NG-T22",
+    "targets are not achieved SLOs or an SLA",
+    "profile does not authorize customer traffic"
+  ],
+  "profile_id": "aws-eu-west-2-multitenant-v1",
+  "profile_version": "1.0.0",
+  "schema_version": 1,
+  "service": {
+    "content_state": "in-memory-only",
+    "region": "eu-west-2",
+    "runtime": "ECS Fargate",
+    "safety_core_dependency": "public SDK only",
+    "tenancy": "multi-tenant",
+    "topology": "single-region multi-AZ"
+  },
+  "slo_targets": {
+    "availability_percent": 99.9,
+    "error_rate_percent": 0.1,
+    "latency_p95_ms": 750,
+    "recovery_point_minutes": 5,
+    "recovery_time_minutes": 30,
+    "throughput_per_task_per_second": 10
+  },
+  "status": "PROPOSED_NOT_IMPLEMENTED",
+  "threat": {
+    "id": "NG-T22",
+    "status": "BLOCKED_FOR_HOSTED_SERVICE"
+  }
+}
