@@ -1,0 +1,92 @@
+name: Deploy protected Hugging Face staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: Exact 40-character commit already merged to main
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: huggingface-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy exact commit and verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: huggingface-staging
+
+    steps:
+      - name: Check out exact source commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_commit }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate exact merged commit
+        env:
+          EXPECTED_COMMIT: ${{ inputs.source_commit }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_COMMIT"
+          git fetch --no-tags origin main
+          git merge-base --is-ancestor "$EXPECTED_COMMIT" origin/main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.18"
+          enable-cache: true
+
+      - name: Install locked deployment environment
+        run: uv sync --locked --all-extras --dev
+
+      - name: Run deployment contract tests
+        run: |
+          uv run --locked ruff check src/normguard/hf_staging.py tests/test_hf_staging.py
+          uv run --locked python -m unittest tests.test_hf_staging tests.test_hf_deployment -v
+
+      - name: Build exact secret-free Space bundle
+        run: |
+          mkdir -p "$RUNNER_TEMP/normguard-space"
+          uv run --locked python -m normguard.hf_staging bundle \
+            --source-root . \
+            --source-commit "${{ inputs.source_commit }}" \
+            --output-dir "$RUNNER_TEMP/normguard-space"
+
+      - name: Upload protected staging bundle
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          test -n "$HF_TOKEN"
+          uvx --from huggingface-hub==0.36.0 hf upload \
+            lakshmianne/normguard-private-pilot \
+            "$RUNNER_TEMP/normguard-space" . \
+            --repo-type space \
+            --commit-message "Deploy NormGuard staging ${{ inputs.source_commit }}"
+
+      - name: Verify readiness and dual authentication
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          NORMGUARD_BEARER_TOKEN: ${{ secrets.NORMGUARD_BEARER_TOKEN }}
+        run: |
+          uv run --locked python -m normguard.hf_staging verify
+
+      - name: Upload non-secret deployment identity
+        uses: actions/upload-artifact@v4
+        with:
+          name: huggingface-staging-${{ inputs.source_commit }}
+          path: ${{ runner.temp }}/normguard-space/deployment-manifest.json
+          if-no-files-found: error
+          retention-days: 30
