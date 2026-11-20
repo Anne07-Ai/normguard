@@ -96,12 +96,22 @@ isolation. Building a web endpoint around it does not satisfy that threat.
 Preparation evidence now exists for each blocker: the independent-review package
 defines the reviewer record and evidence index; ADR 0005 and its machine-readable
 control model define the hosted-service boundary; and NG-CAPACITY-001 provides a
-digest-bound capacity harness. These are execution prerequisites, not closure
-evidence. No reviewer has signed B-001, no hosted boundary has implemented B-002,
-and no representative target-infrastructure run has closed B-003.
+digest-bound capacity harness.
 
-The synthetic pilot did not close or change the required scope of any blocker. These
-blockers prevent stronger claims and any deployment matching their declared scope.
+The exact private, single-tenant Hugging Face CPU Basic pilot has a scoped
+representative `PASS`, recorded in
+[`hf-private-pilot-capacity.json`](hf-private-pilot-capacity.json). The run used
+1,000 measured synthetic requests over 600.447860625 seconds, recorded zero errors,
+observed p95 latency of 576.899375 ms and throughput of
+1.6654235372894997 requests/second. Client process CPU and `tracemalloc`
+observations are not Hugging Face server CPU or RSS.
+
+This result supports only the digest-bound pilot environment and workload. It does
+not authorize customer data, public or multi-tenant hosting, a production SLA or a
+general capacity claim. B-001 remains `OPEN`, B-002 remains `BLOCKED`, NG-T22
+remains `BLOCKED_FOR_HOSTED_SERVICE`, and B-003 remains `OPEN` for its declared
+production scope. These blockers prevent stronger claims and any deployment matching
+their declared scope.
 
 ## Residual risk ownership
 
